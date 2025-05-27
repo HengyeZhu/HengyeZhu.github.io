@@ -1,6 +1,7 @@
 title: Hello World!  
 date: May 24, 2025
 author: Hengye Zhu
+category: GSoC
 
 I'm excited to share that this blog is part of my journey with the **Google Summer of Code** program. As I dive into this incredible opportunity, I'll be documenting my experiences, challenges, and learnings here.  
 
