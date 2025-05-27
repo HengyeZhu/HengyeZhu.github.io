@@ -3,7 +3,7 @@ DEFAULT_DATE_FORMAT = '%B %d, %Y'
 LOCALE = 'en_US.UTF-8'  
 # Basic settings
 AUTHOR = 'HengyeZhu'
-SITENAME = 'Blog'
+SITENAME = 'Hengye_Blog'
 SITEURL = "https://hengyezhu.github.io"
 PATH = "content"
 TIMEZONE = 'Asia/Shanghai'
