@@ -1,5 +1,7 @@
 from datetime import date
 
+LOCALE = 'en_US.UTF-8'
+DEFAULT_DATE_FORMAT = '%B %d, %Y'
 # Basic settings
 AUTHOR = 'HengyeZhu'
 SITENAME = 'Hengye_Blog'
@@ -15,7 +17,6 @@ TRANSLATION_FEED_ATOM = None
 AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
-STATIC_PATHS = ['images']
 # Social widget
 SOCIAL = (
     ("github", "https://github.com/HengyeZhu"),      
