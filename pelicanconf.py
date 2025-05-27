@@ -1,4 +1,6 @@
 from datetime import date
+DEFAULT_DATE_FORMAT = '%B %d, %Y'
+LOCALE = 'en_US.UTF-8'  
 # Basic settings
 AUTHOR = 'HengyeZhu'
 SITENAME = 'Blog'
