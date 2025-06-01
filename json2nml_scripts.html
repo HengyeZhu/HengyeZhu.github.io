@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>json2nml_Scripts &ndash; Hengye_Blog</title>
+
+    <!-- Meta -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Social -->
+    <meta property="article:author" content="Hengye Zhu" />
+    <meta property="article:section" content="GSoC" />
+    <meta property="article:published_time" content="2025-06-01" />
+
+    <meta property="og:type" content="article"/>
+    <meta property="og:title" content="json2nml_Scripts"/>
+    <meta property="og:description" content="Hello everyone! Today I&#39;d like to share several scripts I developed during GSoC for converting morphological data from JSON format to NeuroML format. Step 1: JSON to HOC Conversion First, we&#39;ll extract the morphological data and convert it to HOC format: import json ### extract morphology data and then make manual …"/>
+    <meta property="og:site_name" content="Hengye_Blog" />
+    <meta property="og:url" content="https://hengyezhu.github.io/json2nml_scripts.html"/>
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="json2nml_Scripts">
+    <meta name="twitter:description" content="Hello everyone! Today I&#39;d like to share several scripts I developed during GSoC for converting morphological data from JSON format to NeuroML format. Step 1: JSON to HOC Conversion First, we&#39;ll extract the morphological data and convert it to HOC format: import json ### extract morphology data and then make manual …">
+    <meta name="twitter:url" content="https://hengyezhu.github.io/json2nml_scripts.html">
+
+    <!-- Feed -->
+    <link rel="alternate" type="application/atom+xml" href="https://hengyezhu.github.io/feeds/all.atom.xml" title="Hengye_Blog Atom Feed" />
+    <link rel="alternate" type="application/atom+xml" href="https://hengyezhu.github.io/feeds/gsoc.atom.xml" title="Hengye_Blog Categories Atom Feed" />
+
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:regular,bold">
+    <link rel="stylesheet" type="text/css" href="https://hengyezhu.github.io/theme/css/w3.css">
+    <link rel="stylesheet" type="text/css" href="https://hengyezhu.github.io/theme/css/style.css">
+    <link rel="stylesheet" type="text/css" href="https://hengyezhu.github.io/theme/css/jqcloud.css">
+    <link rel="stylesheet" type="text/css" href="https://hengyezhu.github.io/theme/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://hengyezhu.github.io/theme/css/pygments-highlight-github.css">
+
+    <!-- Icon -->
+
+    <!-- JavaScript -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://hengyezhu.github.io/theme/js/jqcloud.min.js"></script>
+  </head>
+
+  <body>
+    <div class="w3-row w3-card w3-white">
+      <header id="header">
+        <a href="https://hengyezhu.github.io" id="header-logo" title="Home">H</a>
+        <nav id="header-menu">
+          <ul>
+            <li class="w3-bottombar w3-border-white w3-hover-border-green"><a href="https://hengyezhu.github.io/pages/about-me.html">About Me</a></li>
+            <li class="w3-bottombar w3-border-white w3-hover-border-green" style="font-weight: bold;"><a href="https://hengyezhu.github.io/category/gsoc.html">GSoC</a></li>
+          </ul>
+        </nav>
+      </header>
+    </div>
+
+
+
+    <br><br><br>
+
+    <article>
+      <header class="w3-container col-main">
+        <h1>json2nml_Scripts</h1>
+        <div class="post-info">
+          <div class="w3-opacity w3-margin-right w3-margin-bottom" style="flex-grow: 1;">
+            <span><time datetime="2025-06-01T00:00:00+08:00">June 01, 2025</time></span>
+          </div>
+        </div>
+      </header>
+
+      <br>
+
+
+      <div class="col-main w3-container">
+        <section id="content">
+          <p>Hello everyone! Today I'd like to share several scripts I developed during GSoC for converting morphological data from JSON format to NeuroML format.  </p>
+<h3>Step 1: JSON to HOC Conversion</h3>
+<p>First, we'll extract the morphological data and convert it to HOC format:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">json</span>
+
+<span class="c1">### extract morphology data and then make manual adjustments</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;L1_HAC_cIR216_1_cellParams.json&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+<span class="n">topol_data</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">sec_name</span><span class="p">,</span> <span class="n">sec_info</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;secs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">if</span> <span class="s1">&#39;topol&#39;</span> <span class="ow">in</span> <span class="n">sec_info</span><span class="p">:</span>
+        <span class="n">topol_data</span><span class="p">[</span><span class="n">sec_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">sec_info</span><span class="p">[</span><span class="s1">&#39;topol&#39;</span><span class="p">]</span>
+
+<span class="n">morpho_data</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">sec_name</span><span class="p">,</span> <span class="n">sec_info</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;secs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">if</span> <span class="s1">&#39;geom&#39;</span> <span class="ow">in</span> <span class="n">sec_info</span> <span class="ow">and</span> <span class="s1">&#39;pt3d&#39;</span> <span class="ow">in</span> <span class="n">sec_info</span><span class="p">[</span><span class="s1">&#39;geom&#39;</span><span class="p">]:</span>
+        <span class="n">morpho_data</span><span class="p">[</span><span class="n">sec_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">sec_info</span><span class="p">[</span><span class="s1">&#39;geom&#39;</span><span class="p">][</span><span class="s1">&#39;pt3d&#39;</span><span class="p">]</span>
+
+<span class="n">connections</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">sections</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="k">for</span> <span class="n">sec_name</span><span class="p">,</span> <span class="n">topol_info</span> <span class="ow">in</span> <span class="n">topol_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">parent_sec</span> <span class="o">=</span> <span class="n">topol_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;parentSec&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">parent_sec</span><span class="p">:</span>
+        <span class="n">connections</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sec_name</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">parent_sec</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">sec_name</span><span class="p">,</span> <span class="n">pt3d_info</span> <span class="ow">in</span> <span class="n">morpho_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">sections</span><span class="p">[</span><span class="n">sec_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">pt3d_info</span><span class="p">:</span>
+        <span class="n">sections</span><span class="p">[</span><span class="n">sec_name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+
+<span class="n">hoc_code</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<span class="n">hoc_code</span> <span class="o">+=</span> <span class="s2">&quot;proc topol() { </span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="k">for</span> <span class="n">child</span><span class="p">,</span> <span class="n">parent</span> <span class="ow">in</span> <span class="n">connections</span><span class="p">:</span>
+    <span class="n">hoc_code</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;  connect </span><span class="si">{</span><span class="n">child</span><span class="si">}</span><span class="s2">(0), </span><span class="si">{</span><span class="n">parent</span><span class="si">}</span><span class="s2">(1)</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="n">hoc_code</span> <span class="o">+=</span> <span class="s2">&quot;}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+
+<span class="k">for</span> <span class="n">sec_name</span><span class="p">,</span> <span class="n">pt3d_points</span> <span class="ow">in</span> <span class="n">sections</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">hoc_code</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">sec_name</span><span class="si">}</span><span class="s2"> </span><span class="se">{{\n</span><span class="s2">&quot;</span>  
+    <span class="n">hoc_code</span> <span class="o">+=</span> <span class="s2">&quot;    pt3dclear()</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">pt3d_points</span><span class="p">:</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">diam</span> <span class="o">=</span> <span class="n">point</span>
+        <span class="n">hoc_code</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;    pt3dadd(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">z</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">diam</span><span class="si">}</span><span class="s2">)</span><span class="se">\n</span><span class="s2">&quot;</span>  
+    <span class="n">hoc_code</span> <span class="o">+=</span> <span class="s2">&quot;  }</span><span class="se">\n</span><span class="s2">&quot;</span>  
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;L1_HAC_cIR216_1_cell.hoc&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+    <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">hoc_code</span><span class="p">)</span>
+</code></pre></div>
+
+<h3>Step 2: Manual HOC Completion → NML Export</h3>
+<p>Then, we can manually complete the HOC file and use NeuroML's built-in functions:</p>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/usr/bin/env python3</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Convert cell morphology to NeuroML.</span>
+
+<span class="sd">We only export morphologies here. We add the biophysics manually.</span>
+
+<span class="sd">File: NeuroML2/scripts/cell2nml.py</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">pyneuroml</span>
+<span class="kn">from</span> <span class="nn">pyneuroml.neuron</span> <span class="kn">import</span> <span class="n">export_to_neuroml2</span>
+<span class="kn">from</span> <span class="nn">neuron</span> <span class="kn">import</span> <span class="n">h</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">acell</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Main runner method.</span>
+
+<span class="sd">    :param acell: name of cell</span>
+<span class="sd">    :returns: None</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">loader_hoc_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">acell</span><span class="si">}</span><span class="s2">_loader.hoc&quot;</span>
+    <span class="n">loader_hoc_file_txt</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    /*load_file(&quot;nrngui.hoc&quot;)*/</span>
+<span class="s2">    load_file(&quot;stdrun.hoc&quot;)</span>
+<span class="s2">    xopen(&quot;your_path/L1_HAC_cIR216_1_cell.hoc&quot;)</span>
+<span class="s2">    objref cell</span>
+<span class="s2">    cell = new L1_HAC_cIR216_1_cell()</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">loader_hoc_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">loader_hoc_file_txt</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="n">export_to_neuroml2</span><span class="p">(</span><span class="n">loader_hoc_file</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">acell</span><span class="si">}</span><span class="s2">.nml&quot;</span><span class="p">,</span>
+                       <span class="n">includeBiophysicalProperties</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">loader_hoc_file</span><span class="p">)</span>
+    <span class="c1"># Note--a couple of diameters are 0.0, modified to 0.001 to validate the</span>
+    <span class="c1"># model</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;This script only accepts one argument.&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">main</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</code></pre></div>
+
+<h3>Step 3: Handling nseg Data</h3>
+<p>Next, we'll extract the nseg count and write it into the NML file:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">json</span>
+
+<span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;L1_DLAC_cNAC187_1_cellParams.json&#39;</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+<span class="n">section_nseg_mapping</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">if</span> <span class="s1">&#39;secs&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">properties</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;secs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">nseg</span> <span class="o">=</span> <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;geom&#39;</span><span class="p">][</span><span class="s1">&#39;nseg&#39;</span><span class="p">]</span>
+        <span class="n">section_nseg_mapping</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">section</span><span class="p">,</span> <span class="n">nseg</span><span class="p">))</span>
+
+<span class="n">output_file_name</span> <span class="o">=</span> <span class="s1">&#39;section_nseg_mapping.txt&#39;</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_file_name</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">output_file</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">nseg</span> <span class="ow">in</span> <span class="n">section_nseg_mapping</span><span class="p">:</span>
+        <span class="n">output_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">nseg</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Section and nseg mapping:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">nseg</span> <span class="ow">in</span> <span class="n">section_nseg_mapping</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">nseg</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Results have been saved to </span><span class="si">{</span><span class="n">output_file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>And</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">as</span> <span class="nn">ET</span>
+
+<span class="n">NAMESPACE</span> <span class="o">=</span> <span class="s2">&quot;http://www.neuroml.org/schema/neuroml2&quot;</span>
+
+<span class="n">nseg_mapping</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;section_nseg_mapping.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">section</span><span class="p">,</span> <span class="n">nseg</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;: &quot;</span><span class="p">)</span>
+        <span class="n">nseg_mapping</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="n">nseg</span>
+
+<span class="n">nml_file</span> <span class="o">=</span> <span class="s2">&quot;L1_DLAC_cNAC187_1_cell.morph.cell.nml&quot;</span> 
+<span class="n">tree</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">nml_file</span><span class="p">)</span>
+<span class="n">root</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">segment_group</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;.//{{</span><span class="si">{}</span><span class="s2">}}segmentGroup&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">NAMESPACE</span><span class="p">)):</span>
+    <span class="n">group_id</span> <span class="o">=</span> <span class="n">segment_group</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">group_id</span> <span class="ow">in</span> <span class="n">nseg_mapping</span><span class="p">:</span>
+        <span class="n">prop</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;{{</span><span class="si">{}</span><span class="s2">}}property&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">NAMESPACE</span><span class="p">),</span> <span class="n">tag</span><span class="o">=</span><span class="s2">&quot;numberInternalDivisions&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">nseg_mapping</span><span class="p">[</span><span class="n">group_id</span><span class="p">])</span>
+        <span class="n">segment_group</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">prop</span><span class="p">)</span>  
+
+<span class="n">ET</span><span class="o">.</span><span class="n">register_namespace</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">NAMESPACE</span><span class="p">)</span>
+<span class="n">tree</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;L1_DLAC_cNAC187_1_cell.morph.cell.nml&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;UTF-8&quot;</span><span class="p">,</span> <span class="n">xml_declaration</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+
+<p>If time permits, I'll continue improving these scripts—one potential enhancement would be eliminating the manual completion of HOC files by directly converting the extracted JSON data into a HOC template.  </p>
+<p>Thanks for reading!</p>
+        </section>
+
+        <br><br><br>
+
+        <footer>
+          <div class="adjust-width">
+            <div id="author-block" class="w3-light-grey w3-border">
+              <div id="author-info">
+                <a href="https://github.com/HengyeZhu"><img class="avatar" src="https://avatars.githubusercontent.com/u/186930454?s=400&u=0bc1b19dad19038c8d03179fd57ac30cf4b71f15&v=4" onerror="this.src='theme/images/avatar.png'" alt="Avatar"></a>
+                <div style="margin-left: 20px;">
+                  <a href="https://github.com/HengyeZhu"><span id="author-name" class="w3-hover-text-dark-grey">Hengye Zhu</span></a>
+                  <p id="author-story"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <br><br><br>
+
+          <p style="font-size:10pt; font-style: italic;">Did you like this article? Share it with your friends!</p>
+          <div id="share" class="share">
+            <a href="https://www.facebook.com/sharer.php?u=https%3A//hengyezhu.github.io/json2nml_scripts.html&amp;t=Hengye_Blog%3A%20json2nml_Scripts" target="_blank" class="w3-btn w3-indigo">
+              <i class="fa fa-facebook"></i> <span>Facebook</span>
+            </a>
+            <a href="https://twitter.com/share?url=https%3A//hengyezhu.github.io/json2nml_scripts.html&amp;text=Hengye_Blog%3A%20json2nml_Scripts" target="_blank" class="w3-btn w3-blue">
+              <i class="fa fa-twitter"></i> <span>Twitter</span>
+            </a>
+          </div>
+
+          <br><br><br>
+
+
+
+        </footer>
+      </div>
+    </article>
+
+
+    <footer id="footer">
+      <div id="footer-copyright" class="w3-center w3-small w3-text-grey w3-padding-48">
+        <span>
+          &copy;
+          2025          HengyeZhu
+ | <a href="https://hengyezhu.github.io/feeds/all.atom.xml">Atom feed <i class="fa fa-rss" aria-hidden="true"></i></a>        </span>
+      </div>
+    </footer>
+
+
+
+  </body>
+</html>
