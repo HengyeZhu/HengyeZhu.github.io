@@ -1,4 +1,4 @@
-title: Report1
+title: Report 1
 date: June 12, 2025
 author: Hengye Zhu
 category: GSoC
