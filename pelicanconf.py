@@ -36,7 +36,7 @@ MINIMALXY_START_YEAR = 2025
 MINIMALXY_CURRENT_YEAR = date.today().year
 
 # Author settings
-AUTHOR_INTRO = 'Hi! I am Hengye Zhu - an undergraduate student at Shanghai Jiao Tong University. I am interested in HPC.'
+AUTHOR_INTRO = 'Hi! I am Hengye Zhu - an undergraduate student at Shanghai Jiao Tong University. I am interested in Computational Neuroscience and High Performance Computing.'
 AUTHOR_DESCRIPTION = 'Hengye Zhu is an undergraduate student at Shanghai Jiao Tong University. He is interested in Computational Neuroscience and HPC.' 
 AUTHOR_AVATAR = 'https://avatars.githubusercontent.com/u/186930454?s=400&u=0bc1b19dad19038c8d03179fd57ac30cf4b71f15&v=4'
 AUTHOR_WEB = 'https://github.com/HengyeZhu'
