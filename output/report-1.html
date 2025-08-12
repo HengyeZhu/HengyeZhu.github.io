@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Report 1 &ndash; Hengye_Blog</title>
+
+    <!-- Meta -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Social -->
+    <meta property="article:author" content="Hengye Zhu" />
+    <meta property="article:section" content="GSoC" />
+    <meta property="article:published_time" content="2025-06-12" />
+
+    <meta property="og:type" content="article"/>
+    <meta property="og:title" content="Report 1"/>
+    <meta property="og:description" content="I will temporarily record my work progress and issues here. First, I attempted to directly convert from NetPyNE to NeuroML2 using its built-in function, as shown below: sim.createExportNeuroML2(netParams = netParams, simConfig = simConfig,reference = &#39;&#39;) However, several issues arose, such as certain complex ionic currents failing to be parsed, and segment …"/>
+    <meta property="og:site_name" content="Hengye_Blog" />
+    <meta property="og:url" content="https://hengyezhu.github.io/report-1.html"/>
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Report 1">
+    <meta name="twitter:description" content="I will temporarily record my work progress and issues here. First, I attempted to directly convert from NetPyNE to NeuroML2 using its built-in function, as shown below: sim.createExportNeuroML2(netParams = netParams, simConfig = simConfig,reference = &#39;&#39;) However, several issues arose, such as certain complex ionic currents failing to be parsed, and segment …">
+    <meta name="twitter:url" content="https://hengyezhu.github.io/report-1.html">
+
+    <!-- Feed -->
+    <link rel="alternate" type="application/atom+xml" href="https://hengyezhu.github.io/feeds/all.atom.xml" title="Hengye_Blog Atom Feed" />
+    <link rel="alternate" type="application/atom+xml" href="https://hengyezhu.github.io/feeds/gsoc.atom.xml" title="Hengye_Blog Categories Atom Feed" />
+
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:regular,bold">
+    <link rel="stylesheet" type="text/css" href="https://hengyezhu.github.io/theme/css/w3.css">
+    <link rel="stylesheet" type="text/css" href="https://hengyezhu.github.io/theme/css/style.css">
+    <link rel="stylesheet" type="text/css" href="https://hengyezhu.github.io/theme/css/jqcloud.css">
+    <link rel="stylesheet" type="text/css" href="https://hengyezhu.github.io/theme/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://hengyezhu.github.io/theme/css/pygments-highlight-github.css">
+
+    <!-- Icon -->
+
+    <!-- JavaScript -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://hengyezhu.github.io/theme/js/jqcloud.min.js"></script>
+  </head>
+
+  <body>
+    <div class="w3-row w3-card w3-white">
+      <header id="header">
+        <a href="https://hengyezhu.github.io" id="header-logo" title="Home">H</a>
+        <nav id="header-menu">
+          <ul>
+            <li class="w3-bottombar w3-border-white w3-hover-border-green"><a href="https://hengyezhu.github.io/pages/about-me.html">About Me</a></li>
+            <li class="w3-bottombar w3-border-white w3-hover-border-green" style="font-weight: bold;"><a href="https://hengyezhu.github.io/category/gsoc.html">GSoC</a></li>
+          </ul>
+        </nav>
+      </header>
+    </div>
+
+
+
+    <br><br><br>
+
+    <article>
+      <header class="w3-container col-main">
+        <h1>Report 1</h1>
+        <div class="post-info">
+          <div class="w3-opacity w3-margin-right w3-margin-bottom" style="flex-grow: 1;">
+            <span><time datetime="2025-06-12T00:00:00+08:00">June 12, 2025</time></span>
+          </div>
+        </div>
+      </header>
+
+      <br>
+
+
+      <div class="col-main w3-container">
+        <section id="content">
+          <p>I will temporarily record my work progress and issues here.</p>
+<p>First, I attempted to directly convert from NetPyNE to NeuroML2 using its built-in function, as shown below:</p>
+<div class="highlight"><pre><span></span><code><span class="n">sim</span><span class="o">.</span><span class="n">createExportNeuroML2</span><span class="p">(</span><span class="n">netParams</span> <span class="o">=</span> <span class="n">netParams</span><span class="p">,</span> <span class="n">simConfig</span> <span class="o">=</span> <span class="n">simConfig</span><span class="p">,</span><span class="n">reference</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>However, several issues arose, such as certain complex ionic currents failing to be parsed, and segment connections being restricted to positions 0 and 1 (unable to handle intermediate positions like 0.5).</p>
+<p>Based on the observed limitations, this built-in function appears to be restricted to morphology data export.</p>
+<p>Next, I attempted to instantiate the JSON file using NetPyNE, but encountered issues with recording voltage traces. Currently, this is still under investigation.</p>
+<p>To be done...</p>
+        </section>
+
+        <br><br><br>
+
+        <footer>
+          <div class="adjust-width">
+            <div id="author-block" class="w3-light-grey w3-border">
+              <div id="author-info">
+                <a href="https://github.com/HengyeZhu"><img class="avatar" src="https://avatars.githubusercontent.com/u/186930454?s=400&u=0bc1b19dad19038c8d03179fd57ac30cf4b71f15&v=4" onerror="this.src='theme/images/avatar.png'" alt="Avatar"></a>
+                <div style="margin-left: 20px;">
+                  <a href="https://github.com/HengyeZhu"><span id="author-name" class="w3-hover-text-dark-grey">Hengye Zhu</span></a>
+                  <p id="author-story"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <br><br><br>
+
+          <p style="font-size:10pt; font-style: italic;">Did you like this article? Share it with your friends!</p>
+          <div id="share" class="share">
+            <a href="https://www.facebook.com/sharer.php?u=https%3A//hengyezhu.github.io/report-1.html&amp;t=Hengye_Blog%3A%20Report%201" target="_blank" class="w3-btn w3-indigo">
+              <i class="fa fa-facebook"></i> <span>Facebook</span>
+            </a>
+            <a href="https://twitter.com/share?url=https%3A//hengyezhu.github.io/report-1.html&amp;text=Hengye_Blog%3A%20Report%201" target="_blank" class="w3-btn w3-blue">
+              <i class="fa fa-twitter"></i> <span>Twitter</span>
+            </a>
+          </div>
+
+          <br><br><br>
+
+
+
+        </footer>
+      </div>
+    </article>
+
+
+    <footer id="footer">
+      <div id="footer-copyright" class="w3-center w3-small w3-text-grey w3-padding-48">
+        <span>
+          &copy;
+          2025          HengyeZhu
+ | <a href="https://hengyezhu.github.io/feeds/all.atom.xml">Atom feed <i class="fa fa-rss" aria-hidden="true"></i></a>        </span>
+      </div>
+    </footer>
+
+
+
+  </body>
+</html>
