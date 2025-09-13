@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom"><title>Hengye_Blog - HPC</title><link href="https://hengyezhu.github.io/" rel="alternate"/><link href="https://hengyezhu.github.io/feeds/hpc.atom.xml" rel="self"/><id>https://hengyezhu.github.io/</id><updated>2025-08-27T00:00:00+08:00</updated><entry><title>Learning_HPC</title><link href="https://hengyezhu.github.io/learning_hpc.html" rel="alternate"/><published>2025-08-27T00:00:00+08:00</published><updated>2025-08-27T00:00:00+08:00</updated><author><name>Hengye Zhu</name></author><id>tag:hengyezhu.github.io,2025-08-27:/learning_hpc.html</id><content type="html">&lt;p&gt;This article is used to record the resources and projects for my HPC learning.&lt;/p&gt;
 &lt;p&gt;&lt;a href="https://hpc.llnl.gov/documentation/tutorials/introduction-parallel-computing-tutorial"&gt;Parallel_Computing&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href="https://face2ai.com/CUDA-F-1-1-异构计算-CUDA/"&gt;CUDA&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://docs.nvidia.com/cuda/cuda-c-programming-guide/contents.html"&gt;CUDA&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://face2ai.com/CUDA-F-1-1-异构计算-CUDA/"&gt;CUDA_Chinese&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;&lt;a href="https://rocm.docs.amd.com/projects/HIP/en/latest/understand/programming_model.html"&gt;HIP&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;&lt;a href="https://pharr.org/matt/blog/2018/04/18/ispc-origins"&gt;ISPC&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;&lt;a href="https://mpitutorial.com"&gt;MPI&lt;/a&gt;&lt;/p&gt;
