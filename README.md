@@ -1,2 +1,1 @@
-# HengyeZhu.github.io
-Blog
+https://hengyezhu.github.io/
