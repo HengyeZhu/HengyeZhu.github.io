@@ -7,7 +7,9 @@ This article is used to record the resources and projects for my HPC learning.
 
 [Parallel_Computing](https://hpc.llnl.gov/documentation/tutorials/introduction-parallel-computing-tutorial)
 
-[CUDA](https://face2ai.com/CUDA-F-1-1-异构计算-CUDA/)
+[CUDA](https://docs.nvidia.com/cuda/cuda-c-programming-guide/contents.html)
+
+[CUDA_Chinese](https://face2ai.com/CUDA-F-1-1-异构计算-CUDA/)
 
 [HIP](https://rocm.docs.amd.com/projects/HIP/en/latest/understand/programming_model.html)
 
