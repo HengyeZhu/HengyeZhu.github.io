@@ -80,7 +80,7 @@
         </header>
 
         <div class="entry-content">
-          In cuRand, the state of an RNG is a plain struct e.g. for XORWOW: struct curandStateXORWOW { unsigned int d, v[5]; int boxmuller_flag; int boxmuller_flag_double; float boxmuller_extra; double boxmuller_extra_double; }; whereas, in rocRand(https://github.com/ROCm/rocm-libraries/blob/develop/projects/rocrand/library/include/rocrand/rocrand_xorwow.h), the implementation is …
+          In cuRand, the state of an RNG is a plain struct e.g. for XORWOW: struct curandStateXORWOW { unsigned int d, v[5]; int boxmuller_flag; int boxmuller_flag_double; float boxmuller_extra; double boxmuller_extra_double; }; whereas, in rocRand, the implementation is a lot more C++: class xorwow_engine { public: struct xorwow_state { unsigned int d; #ifndef ROCRAND_DETAIL_BM_NOT_IN_STATE …
         </div>
 
         <footer>

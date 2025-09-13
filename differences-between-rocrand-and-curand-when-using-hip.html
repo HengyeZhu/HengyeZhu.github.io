@@ -16,13 +16,13 @@
 
     <meta property="og:type" content="article"/>
     <meta property="og:title" content="Differences between rocRand and cuRand when using HIP"/>
-    <meta property="og:description" content="In cuRand, the state of an RNG is a plain struct e.g. for XORWOW: struct curandStateXORWOW { unsigned int d, v[5]; int boxmuller_flag; int boxmuller_flag_double; float boxmuller_extra; double boxmuller_extra_double; }; whereas, in rocRand(https://github.com/ROCm/rocm-libraries/blob/develop/projects/rocrand/library/include/rocrand/rocrand_xorwow.h), the implementation is …"/>
+    <meta property="og:description" content="In cuRand, the state of an RNG is a plain struct e.g. for XORWOW: struct curandStateXORWOW { unsigned int d, v[5]; int boxmuller_flag; int boxmuller_flag_double; float boxmuller_extra; double boxmuller_extra_double; }; whereas, in rocRand, the implementation is a lot more C++: class xorwow_engine { public: struct xorwow_state { unsigned int d; #ifndef ROCRAND_DETAIL_BM_NOT_IN_STATE …"/>
     <meta property="og:site_name" content="Hengye_Blog" />
     <meta property="og:url" content="https://hengyezhu.github.io/differences-between-rocrand-and-curand-when-using-hip.html"/>
 
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Differences between rocRand and cuRand when using HIP">
-    <meta name="twitter:description" content="In cuRand, the state of an RNG is a plain struct e.g. for XORWOW: struct curandStateXORWOW { unsigned int d, v[5]; int boxmuller_flag; int boxmuller_flag_double; float boxmuller_extra; double boxmuller_extra_double; }; whereas, in rocRand(https://github.com/ROCm/rocm-libraries/blob/develop/projects/rocrand/library/include/rocrand/rocrand_xorwow.h), the implementation is …">
+    <meta name="twitter:description" content="In cuRand, the state of an RNG is a plain struct e.g. for XORWOW: struct curandStateXORWOW { unsigned int d, v[5]; int boxmuller_flag; int boxmuller_flag_double; float boxmuller_extra; double boxmuller_extra_double; }; whereas, in rocRand, the implementation is a lot more C++: class xorwow_engine { public: struct xorwow_state { unsigned int d; #ifndef ROCRAND_DETAIL_BM_NOT_IN_STATE …">
     <meta name="twitter:url" content="https://hengyezhu.github.io/differences-between-rocrand-and-curand-when-using-hip.html">
 
     <!-- Feed -->
@@ -87,7 +87,7 @@
 <span class="p">};</span>
 </code></pre></div>
 
-<p>whereas, in rocRand(https://github.com/ROCm/rocm-libraries/blob/develop/projects/rocrand/library/include/rocrand/rocrand_xorwow.h), the implementation is a lot more C++:</p>
+<p>whereas, in <a href="https://github.com/ROCm/rocm-libraries/blob/develop/projects/rocrand/library/include/rocrand/rocrand_xorwow.h">rocRand</a>, the implementation is a lot more C++:</p>
 <div class="highlight"><pre><span></span><code><span class="n">class</span><span class="w"> </span><span class="n">xorwow_engine</span>
 <span class="p">{</span>
 <span class="n">public</span><span class="o">:</span>
