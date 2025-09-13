@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Articles by Hengye Zhu &ndash; Hengye_Blog</title>
+
+    <!-- Meta -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Social -->
+    <meta property="og:type" content="website"/>
+    <meta property="og:title" content="Hengye_Blog"/>
+    <meta property="og:description" content=""/>
+    <meta property="og:site_name" content="Hengye_Blog" />
+    <meta property="og:url" content="https://hengyezhu.github.io"/>
+    <meta property="og:image" content="https://avatars.githubusercontent.com/u/186930454?s=400&u=0bc1b19dad19038c8d03179fd57ac30cf4b71f15&v=4"/>
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Hengye_Blog">
+    <meta name="twitter:description" content="">
+    <meta name="twitter:url" content="https://hengyezhu.github.io">
+    <meta name="twitter:image" content="https://avatars.githubusercontent.com/u/186930454?s=400&u=0bc1b19dad19038c8d03179fd57ac30cf4b71f15&v=4">
+
+    <!-- Feed -->
+    <link rel="alternate" type="application/atom+xml" href="https://hengyezhu.github.io/feeds/all.atom.xml" title="Hengye_Blog Atom Feed" />
+
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:regular,bold">
+    <link rel="stylesheet" type="text/css" href="https://hengyezhu.github.io/theme/css/w3.css">
+    <link rel="stylesheet" type="text/css" href="https://hengyezhu.github.io/theme/css/style.css">
+    <link rel="stylesheet" type="text/css" href="https://hengyezhu.github.io/theme/css/jqcloud.css">
+    <link rel="stylesheet" type="text/css" href="https://hengyezhu.github.io/theme/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://hengyezhu.github.io/theme/css/pygments-highlight-github.css">
+
+    <!-- Icon -->
+
+    <!-- JavaScript -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://hengyezhu.github.io/theme/js/jqcloud.min.js"></script>
+  </head>
+
+  <body>
+    <div class="w3-row w3-card w3-white">
+      <header id="header">
+        <a href="https://hengyezhu.github.io" id="header-logo" title="Home">H</a>
+        <nav id="header-menu">
+          <ul>
+            <li class="w3-bottombar w3-border-white w3-hover-border-green"><a href="https://hengyezhu.github.io/pages/about-me.html">About Me</a></li>
+            <li class="w3-bottombar w3-border-white w3-hover-border-green" ><a href="https://hengyezhu.github.io/category/genn.html">GeNN</a></li>
+            <li class="w3-bottombar w3-border-white w3-hover-border-green" ><a href="https://hengyezhu.github.io/category/gsoc.html">GSoC</a></li>
+          </ul>
+        </nav>
+      </header>
+    </div>
+
+
+    <br><br><br>
+
+    <div class="w3-container col-main w3-center">
+      <h2>Articles by Hengye Zhu</h2>
+      <br>
+      <a href="https://hengyezhu.github.io/author/hengye-zhu.html" style="display: flex; align-items: center; justify-content: center;"><img style="width: 50px; height: 50px;" src="https://avatars.githubusercontent.com/u/186930454?s=400&u=0bc1b19dad19038c8d03179fd57ac30cf4b71f15&v=4" onerror="this.src='../theme/images/avatar.png'"></img></a>
+    </div>
+
+
+
+    <br><br><br>
+
+    <section id="listing">
+      <article class="w3-container w3-card-2 w3-white col-main">
+        <header>
+          <h2><a href="https://hengyezhu.github.io/differences-between-rocrand-and-curand-when-using-hip.html">Differences between rocRand and cuRand when using HIP</a></h2>
+          <div class="post-info">
+            <div class="w3-opacity w3-margin-right w3-margin-bottom" style="flex-grow: 1;">
+              <span><time datetime="2025-09-12T00:00:00+08:00">September 12, 2025</time> in <a href="https://hengyezhu.github.io/category/genn.html" title="All articles in category GeNN">GeNN</a></span>
+            </div>
+          </div>
+        </header>
+
+        <div class="entry-content">
+          In cuRand, the state of an RNG is a plain struct e.g. for XORWOW: struct curandStateXORWOW { unsigned int d, v[5]; int boxmuller_flag; int boxmuller_flag_double; float boxmuller_extra; double boxmuller_extra_double; }; whereas, in rocRand(https://github.com/ROCm/rocm-libraries/blob/develop/projects/rocrand/library/include/rocrand/rocrand_xorwow.h), the implementation is …
+        </div>
+
+        <footer>
+          <a class="w3-btn w3-green w3-right" href="https://hengyezhu.github.io/differences-between-rocrand-and-curand-when-using-hip.html">Read &#10093;</a>
+        </footer>
+      </article>
+
+      <br><br><br>
+
+      <article class="w3-container w3-card-2 w3-white col-main">
+        <header>
+          <h2><a href="https://hengyezhu.github.io/gsoc_summary.html">GSoC_summary</a></h2>
+          <div class="post-info">
+            <div class="w3-opacity w3-margin-right w3-margin-bottom" style="flex-grow: 1;">
+              <span><time datetime="2025-09-09T00:00:00+08:00">September 09, 2025</time> in <a href="https://hengyezhu.github.io/category/gsoc.html" title="All articles in category GSoC">GSoC</a></span>
+            </div>
+          </div>
+        </header>
+
+        <div class="entry-content">
+          This project will convert Macaque auditory thalamocortical circuits model based on NetPyNE implementation into NeuroML standard formats and testing it across multiple simulation engines to ensure that it produce the same results. First, I converted the morphology and ion channels for almost all neurons in the Macaque_auditory_thalamocortical_model. The conversions for …
+        </div>
+
+        <footer>
+          <a class="w3-btn w3-green w3-right" href="https://hengyezhu.github.io/gsoc_summary.html">Read &#10093;</a>
+        </footer>
+      </article>
+
+      <br><br><br>
+
+      <article class="w3-container w3-card-2 w3-white col-main">
+        <header>
+          <h2><a href="https://hengyezhu.github.io/hello-world.html">Hello World!</a></h2>
+          <div class="post-info">
+            <div class="w3-opacity w3-margin-right w3-margin-bottom" style="flex-grow: 1;">
+              <span><time datetime="2025-05-23T00:00:00+08:00">May 23, 2025</time> in <a href="https://hengyezhu.github.io/category/gsoc.html" title="All articles in category GSoC">GSoC</a></span>
+            </div>
+          </div>
+        </header>
+
+        <div class="entry-content">
+          I am Hengye Zhu, a contributor of Google Summer of Code Program. It is a great honor to be selected for the 2025 GSoC_INCF Project 12: Developing Standardised Biophysically Detailed Neuronal Circuit Models Using NeuroML. As I dive into this project, I'll be documenting my experiences, challenges, and learnings here …
+        </div>
+
+        <footer>
+          <a class="w3-btn w3-green w3-right" href="https://hengyezhu.github.io/hello-world.html">Read &#10093;</a>
+        </footer>
+      </article>
+
+      <br><br><br>
+
+
+
+    </section>
+
+
+    <footer id="footer">
+      <div id="footer-copyright" class="w3-center w3-small w3-text-grey w3-padding-48">
+        <span>
+          &copy;
+          2025          HengyeZhu
+ | <a href="https://hengyezhu.github.io/feeds/all.atom.xml">Atom feed <i class="fa fa-rss" aria-hidden="true"></i></a>        </span>
+      </div>
+    </footer>
+
+
+
+  </body>
+</html>

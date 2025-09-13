@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Differences between rocRand and cuRand when using HIP &ndash; Hengye_Blog</title>
+
+    <!-- Meta -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Social -->
+    <meta property="article:author" content="Hengye Zhu" />
+    <meta property="article:section" content="GeNN" />
+    <meta property="article:published_time" content="2025-09-12" />
+
+    <meta property="og:type" content="article"/>
+    <meta property="og:title" content="Differences between rocRand and cuRand when using HIP"/>
+    <meta property="og:description" content="In cuRand, the state of an RNG is a plain struct e.g. for XORWOW: struct curandStateXORWOW { unsigned int d, v[5]; int boxmuller_flag; int boxmuller_flag_double; float boxmuller_extra; double boxmuller_extra_double; }; whereas, in rocRand(https://github.com/ROCm/rocm-libraries/blob/develop/projects/rocrand/library/include/rocrand/rocrand_xorwow.h), the implementation is …"/>
+    <meta property="og:site_name" content="Hengye_Blog" />
+    <meta property="og:url" content="https://hengyezhu.github.io/differences-between-rocrand-and-curand-when-using-hip.html"/>
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Differences between rocRand and cuRand when using HIP">
+    <meta name="twitter:description" content="In cuRand, the state of an RNG is a plain struct e.g. for XORWOW: struct curandStateXORWOW { unsigned int d, v[5]; int boxmuller_flag; int boxmuller_flag_double; float boxmuller_extra; double boxmuller_extra_double; }; whereas, in rocRand(https://github.com/ROCm/rocm-libraries/blob/develop/projects/rocrand/library/include/rocrand/rocrand_xorwow.h), the implementation is …">
+    <meta name="twitter:url" content="https://hengyezhu.github.io/differences-between-rocrand-and-curand-when-using-hip.html">
+
+    <!-- Feed -->
+    <link rel="alternate" type="application/atom+xml" href="https://hengyezhu.github.io/feeds/all.atom.xml" title="Hengye_Blog Atom Feed" />
+    <link rel="alternate" type="application/atom+xml" href="https://hengyezhu.github.io/feeds/genn.atom.xml" title="Hengye_Blog Categories Atom Feed" />
+
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:regular,bold">
+    <link rel="stylesheet" type="text/css" href="https://hengyezhu.github.io/theme/css/w3.css">
+    <link rel="stylesheet" type="text/css" href="https://hengyezhu.github.io/theme/css/style.css">
+    <link rel="stylesheet" type="text/css" href="https://hengyezhu.github.io/theme/css/jqcloud.css">
+    <link rel="stylesheet" type="text/css" href="https://hengyezhu.github.io/theme/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://hengyezhu.github.io/theme/css/pygments-highlight-github.css">
+
+    <!-- Icon -->
+
+    <!-- JavaScript -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://hengyezhu.github.io/theme/js/jqcloud.min.js"></script>
+  </head>
+
+  <body>
+    <div class="w3-row w3-card w3-white">
+      <header id="header">
+        <a href="https://hengyezhu.github.io" id="header-logo" title="Home">H</a>
+        <nav id="header-menu">
+          <ul>
+            <li class="w3-bottombar w3-border-white w3-hover-border-green"><a href="https://hengyezhu.github.io/pages/about-me.html">About Me</a></li>
+            <li class="w3-bottombar w3-border-white w3-hover-border-green" style="font-weight: bold;"><a href="https://hengyezhu.github.io/category/genn.html">GeNN</a></li>
+            <li class="w3-bottombar w3-border-white w3-hover-border-green" ><a href="https://hengyezhu.github.io/category/gsoc.html">GSoC</a></li>
+          </ul>
+        </nav>
+      </header>
+    </div>
+
+
+
+    <br><br><br>
+
+    <article>
+      <header class="w3-container col-main">
+        <h1>Differences between rocRand and cuRand when using HIP</h1>
+        <div class="post-info">
+          <div class="w3-opacity w3-margin-right w3-margin-bottom" style="flex-grow: 1;">
+            <span><time datetime="2025-09-12T00:00:00+08:00">September 12, 2025</time> in <a href="https://hengyezhu.github.io/category/genn.html" title="All articles in category GeNN">GeNN</a></span>
+          </div>
+        </div>
+      </header>
+
+      <br>
+
+
+      <div class="col-main w3-container">
+        <section id="content">
+          <p>In cuRand, the state of an RNG is a plain struct e.g. for XORWOW:</p>
+<div class="highlight"><pre><span></span><code><span class="k">struct</span><span class="w"> </span><span class="nc">curandStateXORWOW</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">d</span><span class="p">,</span><span class="w"> </span><span class="n">v</span><span class="p">[</span><span class="mi">5</span><span class="p">];</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">boxmuller_flag</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">boxmuller_flag_double</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">boxmuller_extra</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">boxmuller_extra_double</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div>
+
+<p>whereas, in rocRand(https://github.com/ROCm/rocm-libraries/blob/develop/projects/rocrand/library/include/rocrand/rocrand_xorwow.h), the implementation is a lot more C++:</p>
+<div class="highlight"><pre><span></span><code><span class="n">class</span><span class="w"> </span><span class="n">xorwow_engine</span>
+<span class="p">{</span>
+<span class="n">public</span><span class="o">:</span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">xorwow_state</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">d</span><span class="p">;</span>
+
+<span class="w">    </span><span class="cp">#ifndef ROCRAND_DETAIL_BM_NOT_IN_STATE</span>
+
+<span class="w">        </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">boxmuller_float_state</span><span class="p">;</span><span class="w"> </span>
+<span class="w">        </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">boxmuller_double_state</span><span class="p">;</span><span class="w"> </span>
+<span class="w">        </span><span class="kt">float</span><span class="w"> </span><span class="n">boxmuller_float</span><span class="p">;</span><span class="w"> </span>
+<span class="w">        </span><span class="kt">double</span><span class="w"> </span><span class="n">boxmuller_double</span><span class="p">;</span><span class="w"> </span>
+<span class="w">    </span><span class="cp">#endif</span>
+<span class="w">        </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">[</span><span class="mi">5</span><span class="p">];</span>
+<span class="w">    </span><span class="p">};</span>
+
+<span class="w">    </span><span class="n">__forceinline__</span><span class="w"> </span><span class="n">__device__</span><span class="w"> </span><span class="n">__host__</span><span class="w"> </span><span class="n">xorwow_engine</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">seed</span><span class="p">,</span>
+<span class="w">                                                      </span><span class="k">const</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">subsequence</span><span class="p">,</span>
+<span class="w">                                                      </span><span class="k">const</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">offset</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">m_state</span><span class="p">.</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">123456789U</span><span class="p">;</span>
+<span class="w">        </span><span class="n">m_state</span><span class="p">.</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">362436069U</span><span class="p">;</span>
+<span class="w">        </span><span class="n">m_state</span><span class="p">.</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">521288629U</span><span class="p">;</span>
+<span class="w">        </span><span class="n">m_state</span><span class="p">.</span><span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">88675123U</span><span class="p">;</span>
+<span class="w">        </span><span class="n">m_state</span><span class="p">.</span><span class="n">x</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5783321U</span><span class="p">;</span>
+
+<span class="w">        </span><span class="n">m_state</span><span class="p">.</span><span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">6615241U</span><span class="p">;</span>
+
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">s0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">static_cast</span><span class="o">&lt;</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="mh">0x2c7f967fU</span><span class="p">;</span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">s1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">static_cast</span><span class="o">&lt;</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">seed</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="mh">0xa03697cbU</span><span class="p">;</span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">t0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1228688033U</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">s0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">t1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2073658381U</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">s1</span><span class="p">;</span>
+<span class="w">        </span><span class="n">m_state</span><span class="p">.</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">t0</span><span class="p">;</span>
+<span class="w">        </span><span class="n">m_state</span><span class="p">.</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">^=</span><span class="w"> </span><span class="n">t0</span><span class="p">;</span>
+<span class="w">        </span><span class="n">m_state</span><span class="p">.</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">t1</span><span class="p">;</span>
+<span class="w">        </span><span class="n">m_state</span><span class="p">.</span><span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">^=</span><span class="w"> </span><span class="n">t1</span><span class="p">;</span>
+<span class="w">        </span><span class="n">m_state</span><span class="p">.</span><span class="n">x</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">t0</span><span class="p">;</span>
+<span class="w">        </span><span class="n">m_state</span><span class="p">.</span><span class="n">d</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">t1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">t0</span><span class="p">;</span>
+
+<span class="w">        </span><span class="n">discard_subsequence</span><span class="p">(</span><span class="n">subsequence</span><span class="p">);</span>
+<span class="w">        </span><span class="n">discard</span><span class="p">(</span><span class="n">offset</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="n">protected</span><span class="o">:</span>
+<span class="w">    </span><span class="n">xorwow_state</span><span class="w"> </span><span class="n">m_state</span><span class="p">;</span>
+<span class="p">};</span><span class="w"> </span>
+</code></pre></div>
+
+<p>1.When using AMD GPUs, you can't create classes with <strong>device</strong> hiprandState d_rng; as that would mean the constructor needs to be run on device when the kernel is loaded which is understandably not possible.</p>
+<p>2.You can't freely hack with the internals of the RNG state as they don't even provide a getter for the state struct which, irritatingly, is sitting there in m_state protected member.</p>
+<p>To solve the first problem, we can switch global variable to pointer and allocate manually. For example:</p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">Backend::genAllocateMemPreamble</span><span class="p">(</span><span class="n">CodeStream</span><span class="w"> </span><span class="o">&amp;</span><span class="n">os</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">ModelSpecMerged</span><span class="w"> </span><span class="o">&amp;</span><span class="n">modelMerged</span><span class="p">)</span><span class="w"> </span><span class="k">const</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="c1">// If global RNG is required</span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="n">isGlobalDeviceRNGRequired</span><span class="p">(</span><span class="n">modelMerged</span><span class="p">.</span><span class="n">getModel</span><span class="p">()))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">CodeStream</span><span class="o">::</span><span class="n">Scope</span><span class="w"> </span><span class="n">b</span><span class="p">(</span><span class="n">os</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// Allocate memory</span>
+<span class="w">        </span><span class="n">os</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;hiprandStatePhilox4_32_10_t *hostPtr;&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="w">        </span><span class="n">os</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;CHECK_RUNTIME_ERRORS(hipMalloc(&amp;hostPtr, sizeof(hiprandStatePhilox4_32_10_t)));&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+
+<span class="w">        </span><span class="c1">// Copy to device symbol</span>
+<span class="w">        </span><span class="n">os</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="s">&quot;CHECK_RUNTIME_ERRORS(hipMemcpyToSymbol(HIP_SYMBOL(d_rng), &amp;hostPtr, sizeof(void*)));&quot;</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Finally, I would like to thank Dr. James Knight for his tremendous help throughout this process!</p>
+        </section>
+
+        <br><br><br>
+
+        <footer>
+          <div class="adjust-width">
+            <div id="author-block" class="w3-light-grey w3-border">
+              <div id="author-info">
+                <a href="https://github.com/HengyeZhu"><img class="avatar" src="https://avatars.githubusercontent.com/u/186930454?s=400&u=0bc1b19dad19038c8d03179fd57ac30cf4b71f15&v=4" onerror="this.src='theme/images/avatar.png'" alt="Avatar"></a>
+                <div style="margin-left: 20px;">
+                  <a href="https://github.com/HengyeZhu"><span id="author-name" class="w3-hover-text-dark-grey">Hengye Zhu</span></a>
+                  <p id="author-story"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <br><br><br>
+
+          <p style="font-size:10pt; font-style: italic;">Did you like this article? Share it with your friends!</p>
+          <div id="share" class="share">
+            <a href="https://www.facebook.com/sharer.php?u=https%3A//hengyezhu.github.io/differences-between-rocrand-and-curand-when-using-hip.html&amp;t=Hengye_Blog%3A%20Differences%20between%20rocRand%20and%20cuRand%20when%20using%20HIP" target="_blank" class="w3-btn w3-indigo">
+              <i class="fa fa-facebook"></i> <span>Facebook</span>
+            </a>
+            <a href="https://twitter.com/share?url=https%3A//hengyezhu.github.io/differences-between-rocrand-and-curand-when-using-hip.html&amp;text=Hengye_Blog%3A%20Differences%20between%20rocRand%20and%20cuRand%20when%20using%20HIP" target="_blank" class="w3-btn w3-blue">
+              <i class="fa fa-twitter"></i> <span>Twitter</span>
+            </a>
+          </div>
+
+          <br><br><br>
+
+
+
+        </footer>
+      </div>
+    </article>
+
+
+    <footer id="footer">
+      <div id="footer-copyright" class="w3-center w3-small w3-text-grey w3-padding-48">
+        <span>
+          &copy;
+          2025          HengyeZhu
+ | <a href="https://hengyezhu.github.io/feeds/all.atom.xml">Atom feed <i class="fa fa-rss" aria-hidden="true"></i></a>        </span>
+      </div>
+    </footer>
+
+
+
+  </body>
+</html>
