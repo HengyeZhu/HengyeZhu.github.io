@@ -15,7 +15,7 @@ struct curandStateXORWOW {
 };
 ```
 
-whereas, in rocRand(https://github.com/ROCm/rocm-libraries/blob/develop/projects/rocrand/library/include/rocrand/rocrand_xorwow.h), the implementation is a lot more C++:
+whereas, in [rocRand](https://github.com/ROCm/rocm-libraries/blob/develop/projects/rocrand/library/include/rocrand/rocrand_xorwow.h), the implementation is a lot more C++:
 
 ```c
 class xorwow_engine
