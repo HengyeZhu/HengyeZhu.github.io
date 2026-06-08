@@ -252,6 +252,43 @@ ul.social li a:hover {
 #content p {
   margin-top: 0;
   margin-bottom: 1.5rem;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+#content table {
+  width: auto;
+  max-width: 100%;
+  margin: 2rem auto;
+  border-collapse: collapse;
+  display: table;
+  font-size: 11pt;
+  line-height: 1.45;
+}
+
+#content th,
+#content td {
+  padding: 0.55rem 0.75rem;
+  border: 1px solid #ddd;
+  white-space: nowrap;
+}
+
+#content th {
+  background-color: #E8F5E9;
+  border-color: #C8E6C9;
+  color: #2E7D32;
+  font-weight: bold;
+}
+
+#content tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+@media screen and (max-width: 760px) {
+  #content table {
+    display: block;
+    overflow-x: auto;
+  }
 }
 
 #content p > img {
