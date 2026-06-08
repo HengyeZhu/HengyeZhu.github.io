@@ -1,9 +1,9 @@
 title: MIND Simulator Demo
-date: June 7, 2026
+date: June 9, 2026
 author: Hengye Zhu
 category: MIND
 
-This post presents a **MIND_Sim** demo. The demo couples a detailed hippocampal CA3 microcircuit to a whole-brain neural mass model and illustrates the basic workflow of MIND_Sim.
+This post presents a [**MIND_Sim**](https://github.com/HengyeZhu/MIND_Sim) demo. The demo couples a detailed hippocampal CA3 microcircuit to a whole-brain neural mass model and illustrates the basic workflow of MIND_Sim.
 
 The demo uses a synthetic connectivity matrix. Users who want to reproduce the subject-specific workflow can download the HCP `100206` data and run the preprocessing script provided by MIND_Sim [here](https://github.com/HengyeZhu/MIND_Sim/blob/main/examples/ca3_epilepsy_cosim/mind_sim/prepare_hcp100206_ca3.py).
 
