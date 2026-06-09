@@ -813,7 +813,7 @@ NET_RECEIVE(weight) {
 </code></pre></div>
 
 <h2>Performance</h2>
-<p>In this example, MIND_Sim is compared with the TVB-NetPyNE workflow using the current 1 s CA3 epilepsy co-simulation runs.</p>
+<p>In this example, MIND_Sim is compared with a TVB+NEURON reference using the current 1 s CA3 epilepsy co-simulation runs.</p>
 <table>
 <thead>
 <tr>
@@ -828,34 +828,34 @@ NET_RECEIVE(weight) {
 <tr>
 <td>MIND_Sim async</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.281s</td>
-<td style="text-align: right;">14.286s</td>
-<td style="text-align: right;">21.40x</td>
+<td style="text-align: right;">0.274s</td>
+<td style="text-align: right;">14.940s</td>
+<td style="text-align: right;">3.68x</td>
 </tr>
 <tr>
 <td>MIND_Sim async</td>
 <td style="text-align: right;">4</td>
-<td style="text-align: right;">0.288s</td>
-<td style="text-align: right;">5.581s</td>
-<td style="text-align: right;">21.58x</td>
+<td style="text-align: right;">0.289s</td>
+<td style="text-align: right;">5.844s</td>
+<td style="text-align: right;">4.80x</td>
 </tr>
 <tr>
-<td>TVB-NetPyNE</td>
+<td>TVB+NEURON</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">11.060s</td>
-<td style="text-align: right;">305.707s</td>
+<td style="text-align: right;">1.443s</td>
+<td style="text-align: right;">54.967s</td>
 <td style="text-align: right;">1.00x</td>
 </tr>
 <tr>
-<td>TVB-NetPyNE</td>
+<td>TVB+NEURON</td>
 <td style="text-align: right;">4</td>
-<td style="text-align: right;">10.646s</td>
-<td style="text-align: right;">120.413s</td>
+<td style="text-align: right;">1.423s</td>
+<td style="text-align: right;">28.041s</td>
 <td style="text-align: right;">1.00x</td>
 </tr>
 </tbody>
 </table>
-<p>This result should be read as an example-level performance comparison, not as a standardized benchmark. A complete validation is coming soon; at the moment, the reference TVB-NetPyNE implementation is available <a href="https://github.com/HengyeZhu/MIND_Sim/blob/main/examples/ca3_epilepsy_cosim/netpyne_tvb_multiscale/run_tvb_netpyne_ca3_cosim.py">here</a>.</p>
+<p>For the same 1 s runs, the maximum absolute differences between MIND_Sim and the TVB+NEURON reference are <code>1.09e-14</code> for macro <code>x</code>, <code>3.56e-14</code> for macro <code>z</code>, and less than <code>9e-11 mV</code> for representative PYR, BAS, OLM, and PYR Adend3 voltage traces. Spike sample indices are exactly equal for the representative PYR, BAS, and OLM cells. This result should be read as an example-level performance comparison, not as a standardized benchmark. The reference TVB+NEURON implementation is available <a href="https://github.com/HengyeZhu/MIND_Sim/blob/main/examples/ca3_epilepsy_cosim/neuron_tvb/run_tvb_neuron_ca3_cosim.py">here</a>.</p>
         </section>
 
         <br><br><br>
