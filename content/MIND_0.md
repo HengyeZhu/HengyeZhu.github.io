@@ -46,7 +46,7 @@ ms.macro.exchange_window(0.5)
 
 micro = ms.Sim()
 micro.set_device("cpu")
-micro.set_num_threads(int(args.micro_threads))
+micro.set_num_threads(args.micro_threads)
 micro.set_dt(0.025)
 micro.load_mech(str(Path(__file__).resolve().parent / "mod"))
 ```
@@ -767,7 +767,27 @@ for cell in olm_population:
         sid=int(cell.gid),
         params=ca3_olm_spikes_to_vep_params,
     )
+```
 
+The macro initial history can be provided explicitly with TVB-style chronological ordering. The first axis is time, and `history[-1]` is the current `t = 0` state.
+
+```py
+history_steps = round(np.max(rois.delays) / 0.1) + 1
+history_alpha = np.linspace(-1.0, 0.0, history_steps)[:, np.newaxis]
+roi_phase = np.linspace(0.0, 2.0 * np.pi, len(rois.labels), endpoint=False)[np.newaxis, :]
+
+macro_initial_history = np.empty((history_steps, 2, len(rois.labels)))
+macro_initial_history[:, 0] = initial_x + 0.01 * history_alpha * np.sin(roi_phase)
+macro_initial_history[:, 1] = initial_z + 0.002 * history_alpha * np.cos(roi_phase)
+macro_initial_history[-1, 0] = initial_x
+macro_initial_history[-1, 1] = initial_z
+
+rois.initial_history(macro_initial_history, outputs=["x", "z"])
+```
+
+After the cross-scale transforms and macro history are configured, the microcircuit can be built.
+
+```py
 micro.build_microcircuit()
 ```
 
@@ -796,7 +816,7 @@ After recording is configured, the model can be executed.
 ```py
 micro.finitialize(-65.0)
 simulator = ms.Simulator(rois)
-result = simulator.run(float(args.duration_ms))
+result = simulator.run(args.duration_ms)
 ```
 
 ## Performance
@@ -805,9 +825,9 @@ In this example, MIND_Sim is compared with a TVB+NEURON reference using the curr
 
 | Workflow | Threads | Pre-run | Run | Speedup |
 | --- | ---: | ---: | ---: | ---: |
-| MIND_Sim async | 1 | 0.274s | 14.940s | 3.68x |
-| MIND_Sim async | 4 | 0.289s | 5.844s | 4.80x |
-| TVB+NEURON | 1 | 1.443s | 54.967s | 1.00x |
-| TVB+NEURON | 4 | 1.423s | 28.041s | 1.00x |
+| MIND_Sim async | 1 | 2.049s | 15.936s | 3.69x |
+| MIND_Sim async | 4 | 2.050s | 6.205s | 4.82x |
+| TVB+NEURON | 1 | 0.479s | 58.862s | 1.00x |
+| TVB+NEURON | 4 | 0.491s | 29.912s | 1.00x |
 
-For the same 1 s runs, the maximum absolute differences between MIND_Sim and the TVB+NEURON reference are `1.09e-14` for macro `x`, `3.56e-14` for macro `z`, and less than `9e-11 mV` for representative PYR, BAS, OLM, and PYR Adend3 voltage traces. Spike sample indices are exactly equal for the representative PYR, BAS, and OLM cells. This result should be read as an example-level performance comparison, not as a standardized benchmark. The reference TVB+NEURON implementation is available [here](https://github.com/HengyeZhu/MIND_Sim/blob/main/examples/ca3_epilepsy_cosim/neuron_tvb/run_tvb_neuron_ca3_cosim.py).
+For the same 1 s runs, using the TVB+NEURON reference with TVB's official macro APIs, the maximum absolute differences between MIND_Sim and the reference are `1.28464e-06` for macro `x`, `1.4922e-09` for macro `z`, and `2.17177e-10 mV` for representative PYR, BAS, OLM, and PYR Adend3 voltage traces. The macro comparison includes the precision boundary between TVB's single-precision (`float32`) state/history storage and MIND_Sim's double-precision macro state. Spike sample indices are exactly equal for the representative PYR, BAS, and OLM cells. This result should be read as an example-level performance comparison, not as a standardized benchmark. The reference TVB+NEURON implementation is available [here](https://github.com/HengyeZhu/MIND_Sim/blob/main/examples/ca3_epilepsy_cosim/neuron_tvb/run_tvb_neuron_ca3_cosim.py).
