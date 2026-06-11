@@ -61,6 +61,10 @@ The first step in MIND_Sim is to create ROIs from a connectivity matrix like [th
 import mind_sim as ms
 
 rois = ms.macro.load_rois(args.connectivity_csv)
+roi_list = rois.rois()
+roi_labels = rois.labels
+roi_weights = rois.weights
+roi_delays = rois.delays
 left_ca3_roi = rois.roi("Left-CA3")
 ```
 
@@ -715,9 +719,9 @@ for cell in pyr_population:
 The same `mod/` directory contains the extended MOD mechanisms used by the macro layer and by the cross-scale transforms. `tvb_epileptor2d` defines the ROI-level neural mass. `vep_x_macro2macro` propagates the `x` exposure between macro ROIs. For the micro ROI, `ca3_input_macro2macro` collects incoming macro activity into the `ca3_input` variable.
 
 ```py
-for target_index, target in enumerate(rois.rois()):
-    for source_index, source_label in enumerate(rois.labels):
-        if rois.weights[target_index][source_index] == 0.0:
+for target_index, target in enumerate(roi_list):
+    for source_index, source_label in enumerate(roi_labels):
+        if roi_weights[target_index][source_index] == 0.0:
             continue
         target.insert(
             source_label,
@@ -767,11 +771,11 @@ for cell in olm_population:
 The macro initial history can be provided explicitly with TVB-style chronological ordering. The first axis is time, and `history[-1]` is the current `t = 0` state.
 
 ```py
-history_steps = round(np.max(rois.delays) / 0.1) + 1
+history_steps = round(np.max(roi_delays) / 0.1) + 1
 history_alpha = np.linspace(-1.0, 0.0, history_steps)[:, np.newaxis]
-roi_phase = np.linspace(0.0, 2.0 * np.pi, len(rois.labels), endpoint=False)[np.newaxis, :]
+roi_phase = np.linspace(0.0, 2.0 * np.pi, len(roi_labels), endpoint=False)[np.newaxis, :]
 
-macro_initial_history = np.empty((history_steps, 2, len(rois.labels)))
+macro_initial_history = np.empty((history_steps, 2, len(roi_labels)))
 macro_initial_history[:, 0] = initial_x + 0.01 * history_alpha * np.sin(roi_phase)
 macro_initial_history[:, 1] = initial_z + 0.002 * history_alpha * np.cos(roi_phase)
 macro_initial_history[-1, 0] = initial_x
