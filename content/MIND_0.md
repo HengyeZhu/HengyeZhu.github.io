@@ -715,18 +715,13 @@ for cell in pyr_population:
 The same `mod/` directory contains the extended MOD mechanisms used by the macro layer and by the cross-scale transforms. `tvb_epileptor2d` defines the ROI-level neural mass. `vep_x_macro2macro` propagates the `x` exposure between macro ROIs. For the micro ROI, `ca3_input_macro2macro` collects incoming macro activity into the `ca3_input` variable.
 
 ```py
-for target in rois.rois():
-    if target.label == left_ca3_roi.label:
-        for source in rois.rois():
-            target.insert(
-                source.label,
-                "ca3_input_macro2macro",
-            )
-        continue
-    for source in rois.rois():
+for target_index, target in enumerate(rois.rois()):
+    for source_index, source_label in enumerate(rois.labels):
+        if rois.weights[target_index][source_index] == 0.0:
+            continue
         target.insert(
-            source.label,
-            "vep_x_macro2macro",
+            source_label,
+            "ca3_input_macro2macro" if target.label == left_ca3_roi.label else "vep_x_macro2macro",
         )
 ```
 
