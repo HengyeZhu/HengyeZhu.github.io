@@ -107,7 +107,7 @@ mind_nrnivmodl<span class="w"> </span>mod
 
 <span class="n">micro</span> <span class="o">=</span> <span class="n">ms</span><span class="o">.</span><span class="n">Sim</span><span class="p">()</span>
 <span class="n">micro</span><span class="o">.</span><span class="n">set_device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
-<span class="n">micro</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">micro_threads</span><span class="p">))</span>
+<span class="n">micro</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">micro_threads</span><span class="p">)</span>
 <span class="n">micro</span><span class="o">.</span><span class="n">set_dt</span><span class="p">(</span><span class="mf">0.025</span><span class="p">)</span>
 <span class="n">micro</span><span class="o">.</span><span class="n">load_mech</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;mod&quot;</span><span class="p">))</span>
 </code></pre></div>
@@ -787,8 +787,24 @@ NET_RECEIVE(weight) {
         <span class="n">sid</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">gid</span><span class="p">),</span>
         <span class="n">params</span><span class="o">=</span><span class="n">ca3_olm_spikes_to_vep_params</span><span class="p">,</span>
     <span class="p">)</span>
+</code></pre></div>
 
-<span class="n">micro</span><span class="o">.</span><span class="n">build_microcircuit</span><span class="p">()</span>
+<p>The macro initial history can be provided explicitly with TVB-style chronological ordering. The first axis is time, and <code>history[-1]</code> is the current <code>t = 0</code> state.</p>
+<div class="highlight"><pre><span></span><code><span class="n">history_steps</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">rois</span><span class="o">.</span><span class="n">delays</span><span class="p">)</span> <span class="o">/</span> <span class="mf">0.1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="n">history_alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">history_steps</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+<span class="n">roi_phase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">rois</span><span class="o">.</span><span class="n">labels</span><span class="p">),</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
+
+<span class="n">macro_initial_history</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">history_steps</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">rois</span><span class="o">.</span><span class="n">labels</span><span class="p">)))</span>
+<span class="n">macro_initial_history</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_x</span> <span class="o">+</span> <span class="mf">0.01</span> <span class="o">*</span> <span class="n">history_alpha</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">roi_phase</span><span class="p">)</span>
+<span class="n">macro_initial_history</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_z</span> <span class="o">+</span> <span class="mf">0.002</span> <span class="o">*</span> <span class="n">history_alpha</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">roi_phase</span><span class="p">)</span>
+<span class="n">macro_initial_history</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_x</span>
+<span class="n">macro_initial_history</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_z</span>
+
+<span class="n">rois</span><span class="o">.</span><span class="n">initial_history</span><span class="p">(</span><span class="n">macro_initial_history</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">])</span>
+</code></pre></div>
+
+<p>After the cross-scale transforms and macro history are configured, the microcircuit can be built.</p>
+<div class="highlight"><pre><span></span><code><span class="n">micro</span><span class="o">.</span><span class="n">build_microcircuit</span><span class="p">()</span>
 </code></pre></div>
 
 <h2>Recording</h2>
@@ -809,7 +825,7 @@ NET_RECEIVE(weight) {
 <p>After recording is configured, the model can be executed.</p>
 <div class="highlight"><pre><span></span><code><span class="n">micro</span><span class="o">.</span><span class="n">finitialize</span><span class="p">(</span><span class="o">-</span><span class="mf">65.0</span><span class="p">)</span>
 <span class="n">simulator</span> <span class="o">=</span> <span class="n">ms</span><span class="o">.</span><span class="n">Simulator</span><span class="p">(</span><span class="n">rois</span><span class="p">)</span>
-<span class="n">result</span> <span class="o">=</span> <span class="n">simulator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">duration_ms</span><span class="p">))</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">simulator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">duration_ms</span><span class="p">)</span>
 </code></pre></div>
 
 <h2>Performance</h2>
@@ -828,34 +844,34 @@ NET_RECEIVE(weight) {
 <tr>
 <td>MIND_Sim async</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.274s</td>
-<td style="text-align: right;">14.940s</td>
-<td style="text-align: right;">3.68x</td>
+<td style="text-align: right;">2.049s</td>
+<td style="text-align: right;">15.936s</td>
+<td style="text-align: right;">3.69x</td>
 </tr>
 <tr>
 <td>MIND_Sim async</td>
 <td style="text-align: right;">4</td>
-<td style="text-align: right;">0.289s</td>
-<td style="text-align: right;">5.844s</td>
-<td style="text-align: right;">4.80x</td>
+<td style="text-align: right;">2.050s</td>
+<td style="text-align: right;">6.205s</td>
+<td style="text-align: right;">4.82x</td>
 </tr>
 <tr>
 <td>TVB+NEURON</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">1.443s</td>
-<td style="text-align: right;">54.967s</td>
+<td style="text-align: right;">0.479s</td>
+<td style="text-align: right;">58.862s</td>
 <td style="text-align: right;">1.00x</td>
 </tr>
 <tr>
 <td>TVB+NEURON</td>
 <td style="text-align: right;">4</td>
-<td style="text-align: right;">1.423s</td>
-<td style="text-align: right;">28.041s</td>
+<td style="text-align: right;">0.491s</td>
+<td style="text-align: right;">29.912s</td>
 <td style="text-align: right;">1.00x</td>
 </tr>
 </tbody>
 </table>
-<p>For the same 1 s runs, the maximum absolute differences between MIND_Sim and the TVB+NEURON reference are <code>1.09e-14</code> for macro <code>x</code>, <code>3.56e-14</code> for macro <code>z</code>, and less than <code>9e-11 mV</code> for representative PYR, BAS, OLM, and PYR Adend3 voltage traces. Spike sample indices are exactly equal for the representative PYR, BAS, and OLM cells. This result should be read as an example-level performance comparison, not as a standardized benchmark. The reference TVB+NEURON implementation is available <a href="https://github.com/HengyeZhu/MIND_Sim/blob/main/examples/ca3_epilepsy_cosim/neuron_tvb/run_tvb_neuron_ca3_cosim.py">here</a>.</p>
+<p>For the same 1 s runs, using the TVB+NEURON reference with TVB's official macro APIs, the maximum absolute differences between MIND_Sim and the reference are <code>1.28464e-06</code> for macro <code>x</code>, <code>1.4922e-09</code> for macro <code>z</code>, and <code>2.17177e-10 mV</code> for representative PYR, BAS, OLM, and PYR Adend3 voltage traces. The macro comparison includes the precision boundary between TVB's single-precision (<code>float32</code>) state/history storage and MIND_Sim's double-precision macro state. Spike sample indices are exactly equal for the representative PYR, BAS, and OLM cells. This result should be read as an example-level performance comparison, not as a standardized benchmark. The reference TVB+NEURON implementation is available <a href="https://github.com/HengyeZhu/MIND_Sim/blob/main/examples/ca3_epilepsy_cosim/neuron_tvb/run_tvb_neuron_ca3_cosim.py">here</a>.</p>
         </section>
 
         <br><br><br>
