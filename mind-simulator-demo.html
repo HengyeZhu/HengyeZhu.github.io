@@ -93,7 +93,9 @@
 <p>Since the main goal of this demo is to demonstrate the MIND_Sim workflow, the model parameters were not specifically optimized; instead, they largely follow the original model settings.</p>
 <h2>Simulation Setup</h2>
 <p>Before running the script, compile the MOD mechanisms from the example directory:</p>
-<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>ca3_epilepsy_cosim/mind_sim
+<div class="highlight"><pre><span></span><code>conda<span class="w"> </span>activate<span class="w"> </span>mind_sim
+pip<span class="w"> </span>install<span class="w"> </span>.
+<span class="nb">cd</span><span class="w"> </span>ca3_epilepsy_cosim/mind_sim
 mind_nrnivmodl<span class="w"> </span>mod
 </code></pre></div>
 
@@ -177,6 +179,13 @@ mind_nrnivmodl<span class="w"> </span>mod
 <span class="n">pyr_population</span> <span class="o">=</span> <span class="n">micro</span><span class="o">.</span><span class="n">population</span><span class="p">(</span><span class="s2">&quot;PYR&quot;</span><span class="p">)</span>
 <span class="n">bas_population</span> <span class="o">=</span> <span class="n">micro</span><span class="o">.</span><span class="n">population</span><span class="p">(</span><span class="s2">&quot;BAS&quot;</span><span class="p">)</span>
 <span class="n">olm_population</span> <span class="o">=</span> <span class="n">micro</span><span class="o">.</span><span class="n">population</span><span class="p">(</span><span class="s2">&quot;OLM&quot;</span><span class="p">)</span>
+<span class="n">network</span> <span class="o">=</span> <span class="n">micro</span><span class="o">.</span><span class="n">network</span><span class="p">()</span>
+<span class="n">pyr_gid_begin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">pyr_population</span><span class="o">.</span><span class="n">gid_begin</span><span class="p">)</span>
+<span class="n">bas_gid_begin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">bas_population</span><span class="o">.</span><span class="n">gid_begin</span><span class="p">)</span>
+<span class="n">olm_gid_begin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">olm_population</span><span class="o">.</span><span class="n">gid_begin</span><span class="p">)</span>
+<span class="n">pyr_indices</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">PYR_COUNT</span><span class="p">)</span>
+<span class="n">bas_indices</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">BAS_COUNT</span><span class="p">)</span>
+<span class="n">olm_indices</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">OLM_COUNT</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">pyr_population</span><span class="p">:</span>
     <span class="n">cell</span><span class="o">.</span><span class="n">v_init</span> <span class="o">=</span> <span class="o">-</span><span class="mf">65.0</span>
@@ -214,7 +223,7 @@ mind_nrnivmodl<span class="w"> </span>mod
     <span class="n">cell</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;soma&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">](</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s2">&quot;IClamp&quot;</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="s2">&quot;del&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">&quot;dur&quot;</span><span class="p">:</span> <span class="mf">1.0e9</span><span class="p">,</span> <span class="s2">&quot;amp&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">})</span>
     <span class="n">soma</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;soma&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">](</span><span class="mf">0.5</span><span class="p">)</span>
     <span class="n">sid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">gid</span><span class="p">)</span>
-    <span class="n">micro</span><span class="o">.</span><span class="n">network</span><span class="p">()</span><span class="o">.</span><span class="n">register_spike_source</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">soma</span><span class="o">.</span><span class="n">_ref_v</span><span class="p">,</span> <span class="n">SPIKE_THRESHOLD_MV</span><span class="p">)</span>
+    <span class="n">network</span><span class="o">.</span><span class="n">register_spike_source</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">soma</span><span class="o">.</span><span class="n">_ref_v</span><span class="p">,</span> <span class="n">SPIKE_THRESHOLD_MV</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">bas_population</span><span class="p">:</span>
     <span class="n">cell</span><span class="o">.</span><span class="n">v_init</span> <span class="o">=</span> <span class="o">-</span><span class="mf">65.0</span>
     <span class="n">soma</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;soma&quot;</span><span class="p">)</span>
@@ -224,7 +233,7 @@ mind_nrnivmodl<span class="w"> </span>mod
     <span class="n">soma</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s2">&quot;Nafbwb&quot;</span><span class="p">)</span>
     <span class="n">soma</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s2">&quot;Kdrbwb&quot;</span><span class="p">)</span>
     <span class="n">sid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">gid</span><span class="p">)</span>
-    <span class="n">micro</span><span class="o">.</span><span class="n">network</span><span class="p">()</span><span class="o">.</span><span class="n">register_spike_source</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">soma</span><span class="p">[</span><span class="mi">0</span><span class="p">](</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">_ref_v</span><span class="p">,</span> <span class="n">SPIKE_THRESHOLD_MV</span><span class="p">)</span>
+    <span class="n">network</span><span class="o">.</span><span class="n">register_spike_source</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">soma</span><span class="p">[</span><span class="mi">0</span><span class="p">](</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">_ref_v</span><span class="p">,</span> <span class="n">SPIKE_THRESHOLD_MV</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">olm_population</span><span class="p">:</span>
     <span class="n">cell</span><span class="o">.</span><span class="n">v_init</span> <span class="o">=</span> <span class="o">-</span><span class="mf">65.0</span>
     <span class="n">soma</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;soma&quot;</span><span class="p">)</span>
@@ -239,7 +248,7 @@ mind_nrnivmodl<span class="w"> </span>mod
     <span class="n">soma</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s2">&quot;KCaolmw&quot;</span><span class="p">)</span>
     <span class="n">soma</span><span class="p">[</span><span class="mi">0</span><span class="p">](</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s2">&quot;IClamp&quot;</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="s2">&quot;del&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">&quot;dur&quot;</span><span class="p">:</span> <span class="mf">1.0e9</span><span class="p">,</span> <span class="s2">&quot;amp&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">25e-3</span><span class="p">})</span>
     <span class="n">sid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">gid</span><span class="p">)</span>
-    <span class="n">micro</span><span class="o">.</span><span class="n">network</span><span class="p">()</span><span class="o">.</span><span class="n">register_spike_source</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">soma</span><span class="p">[</span><span class="mi">0</span><span class="p">](</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">_ref_v</span><span class="p">,</span> <span class="n">SPIKE_THRESHOLD_MV</span><span class="p">)</span>
+    <span class="n">network</span><span class="o">.</span><span class="n">register_spike_source</span><span class="p">(</span><span class="n">sid</span><span class="p">,</span> <span class="n">soma</span><span class="p">[</span><span class="mi">0</span><span class="p">](</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">_ref_v</span><span class="p">,</span> <span class="n">SPIKE_THRESHOLD_MV</span><span class="p">)</span>
 </code></pre></div>
 
 <p>Voltage locations that can emit spikes are registered as spike sources while each population is configured. Although this example uses <code>sid = int(cell.gid)</code> in <code>register_spike_source(sid, ref, threshold)</code>, the two are different concepts: <code>cell.gid</code> identifies a cell, while <code>sid</code> identifies a registered spike source. This example uses the same value only because each cell contributes one spike source.</p>
@@ -256,8 +265,8 @@ mind_nrnivmodl<span class="w"> </span>mod
         <span class="n">r</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
         <span class="n">e</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">for</span> <span class="n">pyr_local</span> <span class="ow">in</span> <span class="n">conn_rng</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">PYR_COUNT</span><span class="p">),</span> <span class="mi">100</span><span class="p">):</span>
-        <span class="n">micro</span><span class="o">.</span><span class="n">network</span><span class="p">()</span><span class="o">.</span><span class="n">sid_connect</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pyr_population</span><span class="o">.</span><span class="n">gid_begin</span><span class="p">)</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">pyr_local</span><span class="p">),</span> <span class="n">target</span><span class="p">,</span> <span class="mf">1.15</span> <span class="o">*</span> <span class="mf">1.2e-3</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">pyr_local</span> <span class="ow">in</span> <span class="n">conn_rng</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">pyr_indices</span><span class="p">,</span> <span class="mi">100</span><span class="p">):</span>
+        <span class="n">network</span><span class="o">.</span><span class="n">sid_connect</span><span class="p">(</span><span class="n">pyr_gid_begin</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">pyr_local</span><span class="p">),</span> <span class="n">target</span><span class="p">,</span> <span class="mf">1.15</span> <span class="o">*</span> <span class="mf">1.2e-3</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">olm_population</span><span class="p">:</span>
     <span class="n">target</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;soma&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">](</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span>
@@ -269,11 +278,11 @@ mind_nrnivmodl<span class="w"> </span>mod
         <span class="n">r</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
         <span class="n">e</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">for</span> <span class="n">pyr_local</span> <span class="ow">in</span> <span class="n">conn_rng</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">PYR_COUNT</span><span class="p">),</span> <span class="mi">10</span><span class="p">):</span>
-        <span class="n">micro</span><span class="o">.</span><span class="n">network</span><span class="p">()</span><span class="o">.</span><span class="n">sid_connect</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pyr_population</span><span class="o">.</span><span class="n">gid_begin</span><span class="p">)</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">pyr_local</span><span class="p">),</span> <span class="n">target</span><span class="p">,</span> <span class="mf">0.7e-3</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">pyr_local</span> <span class="ow">in</span> <span class="n">conn_rng</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">pyr_indices</span><span class="p">,</span> <span class="mi">10</span><span class="p">):</span>
+        <span class="n">network</span><span class="o">.</span><span class="n">sid_connect</span><span class="p">(</span><span class="n">pyr_gid_begin</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">pyr_local</span><span class="p">),</span> <span class="n">target</span><span class="p">,</span> <span class="mf">0.7e-3</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">pyr_population</span><span class="p">:</span>
-    <span class="n">pyr_local_post</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">gid</span><span class="p">)</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">pyr_population</span><span class="o">.</span><span class="n">gid_begin</span><span class="p">)</span>
+    <span class="n">pyr_local_post</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">gid</span><span class="p">)</span> <span class="o">-</span> <span class="n">pyr_gid_begin</span>
     <span class="n">target</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;Bdend&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">](</span><span class="mf">1.0</span><span class="p">)</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span>
         <span class="s2">&quot;MyExp2SynNMDABB&quot;</span><span class="p">,</span>
         <span class="n">tau1</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
@@ -283,58 +292,58 @@ mind_nrnivmodl<span class="w"> </span>mod
         <span class="n">r</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
         <span class="n">e</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">for</span> <span class="n">pyr_local_pre</span> <span class="ow">in</span> <span class="n">conn_rng</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">PYR_COUNT</span><span class="p">),</span> <span class="mi">25</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">pyr_local_pre</span> <span class="ow">in</span> <span class="n">conn_rng</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">pyr_indices</span><span class="p">,</span> <span class="mi">25</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">pyr_local_pre</span> <span class="o">==</span> <span class="n">pyr_local_post</span><span class="p">:</span>
             <span class="k">continue</span>
-        <span class="n">micro</span><span class="o">.</span><span class="n">network</span><span class="p">()</span><span class="o">.</span><span class="n">sid_connect</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pyr_population</span><span class="o">.</span><span class="n">gid_begin</span><span class="p">)</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">pyr_local_pre</span><span class="p">),</span> <span class="n">target</span><span class="p">,</span> <span class="mf">0.004e-3</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+        <span class="n">network</span><span class="o">.</span><span class="n">sid_connect</span><span class="p">(</span><span class="n">pyr_gid_begin</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">pyr_local_pre</span><span class="p">),</span> <span class="n">target</span><span class="p">,</span> <span class="mf">0.004e-3</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">bas_population</span><span class="p">:</span>
     <span class="n">target</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;soma&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">](</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s2">&quot;MyExp2SynBB&quot;</span><span class="p">,</span> <span class="n">tau1</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">tau2</span><span class="o">=</span><span class="mf">5.3</span><span class="p">,</span> <span class="n">e</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">pyr_local</span> <span class="ow">in</span> <span class="n">conn_rng</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">PYR_COUNT</span><span class="p">),</span> <span class="mi">100</span><span class="p">):</span>
-        <span class="n">micro</span><span class="o">.</span><span class="n">network</span><span class="p">()</span><span class="o">.</span><span class="n">sid_connect</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pyr_population</span><span class="o">.</span><span class="n">gid_begin</span><span class="p">)</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">pyr_local</span><span class="p">),</span> <span class="n">target</span><span class="p">,</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="mf">1.2e-3</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">pyr_local</span> <span class="ow">in</span> <span class="n">conn_rng</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">pyr_indices</span><span class="p">,</span> <span class="mi">100</span><span class="p">):</span>
+        <span class="n">network</span><span class="o">.</span><span class="n">sid_connect</span><span class="p">(</span><span class="n">pyr_gid_begin</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">pyr_local</span><span class="p">),</span> <span class="n">target</span><span class="p">,</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="mf">1.2e-3</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">olm_population</span><span class="p">:</span>
     <span class="n">target</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;soma&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">](</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s2">&quot;MyExp2SynBB&quot;</span><span class="p">,</span> <span class="n">tau1</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">tau2</span><span class="o">=</span><span class="mf">5.3</span><span class="p">,</span> <span class="n">e</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">pyr_local</span> <span class="ow">in</span> <span class="n">conn_rng</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">PYR_COUNT</span><span class="p">),</span> <span class="mi">10</span><span class="p">):</span>
-        <span class="n">micro</span><span class="o">.</span><span class="n">network</span><span class="p">()</span><span class="o">.</span><span class="n">sid_connect</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pyr_population</span><span class="o">.</span><span class="n">gid_begin</span><span class="p">)</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">pyr_local</span><span class="p">),</span> <span class="n">target</span><span class="p">,</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="mf">1.2e-3</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">pyr_local</span> <span class="ow">in</span> <span class="n">conn_rng</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">pyr_indices</span><span class="p">,</span> <span class="mi">10</span><span class="p">):</span>
+        <span class="n">network</span><span class="o">.</span><span class="n">sid_connect</span><span class="p">(</span><span class="n">pyr_gid_begin</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">pyr_local</span><span class="p">),</span> <span class="n">target</span><span class="p">,</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="mf">1.2e-3</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">pyr_population</span><span class="p">:</span>
-    <span class="n">pyr_local_post</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">gid</span><span class="p">)</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">pyr_population</span><span class="o">.</span><span class="n">gid_begin</span><span class="p">)</span>
+    <span class="n">pyr_local_post</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">gid</span><span class="p">)</span> <span class="o">-</span> <span class="n">pyr_gid_begin</span>
     <span class="n">target</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;Bdend&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">](</span><span class="mf">1.0</span><span class="p">)</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s2">&quot;MyExp2SynBB&quot;</span><span class="p">,</span> <span class="n">tau1</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">tau2</span><span class="o">=</span><span class="mf">5.3</span><span class="p">,</span> <span class="n">e</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">pyr_local_pre</span> <span class="ow">in</span> <span class="n">conn_rng</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">PYR_COUNT</span><span class="p">),</span> <span class="mi">25</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">pyr_local_pre</span> <span class="ow">in</span> <span class="n">conn_rng</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">pyr_indices</span><span class="p">,</span> <span class="mi">25</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">pyr_local_pre</span> <span class="o">==</span> <span class="n">pyr_local_post</span><span class="p">:</span>
             <span class="k">continue</span>
-        <span class="n">micro</span><span class="o">.</span><span class="n">network</span><span class="p">()</span><span class="o">.</span><span class="n">sid_connect</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pyr_population</span><span class="o">.</span><span class="n">gid_begin</span><span class="p">)</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">pyr_local_pre</span><span class="p">),</span> <span class="n">target</span><span class="p">,</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="mf">0.04e-3</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+        <span class="n">network</span><span class="o">.</span><span class="n">sid_connect</span><span class="p">(</span><span class="n">pyr_gid_begin</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">pyr_local_pre</span><span class="p">),</span> <span class="n">target</span><span class="p">,</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="mf">0.04e-3</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">bas_population</span><span class="p">:</span>
-    <span class="n">bas_local_post</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">gid</span><span class="p">)</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">bas_population</span><span class="o">.</span><span class="n">gid_begin</span><span class="p">)</span>
+    <span class="n">bas_local_post</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">gid</span><span class="p">)</span> <span class="o">-</span> <span class="n">bas_gid_begin</span>
     <span class="n">target</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;soma&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">](</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s2">&quot;MyExp2SynBB&quot;</span><span class="p">,</span> <span class="n">tau1</span><span class="o">=</span><span class="mf">0.07</span><span class="p">,</span> <span class="n">tau2</span><span class="o">=</span><span class="mf">9.1</span><span class="p">,</span> <span class="n">e</span><span class="o">=-</span><span class="mf">80.0</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">bas_local_pre</span> <span class="ow">in</span> <span class="n">conn_rng</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">BAS_COUNT</span><span class="p">),</span> <span class="mi">60</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">bas_local_pre</span> <span class="ow">in</span> <span class="n">conn_rng</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">bas_indices</span><span class="p">,</span> <span class="mi">60</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">bas_local_pre</span> <span class="o">==</span> <span class="n">bas_local_post</span><span class="p">:</span>
             <span class="k">continue</span>
-        <span class="n">micro</span><span class="o">.</span><span class="n">network</span><span class="p">()</span><span class="o">.</span><span class="n">sid_connect</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">bas_population</span><span class="o">.</span><span class="n">gid_begin</span><span class="p">)</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">bas_local_pre</span><span class="p">),</span> <span class="n">target</span><span class="p">,</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="mf">1.5e-3</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+        <span class="n">network</span><span class="o">.</span><span class="n">sid_connect</span><span class="p">(</span><span class="n">bas_gid_begin</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">bas_local_pre</span><span class="p">),</span> <span class="n">target</span><span class="p">,</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="mf">1.5e-3</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">pyr_population</span><span class="p">:</span>
     <span class="n">target</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;soma&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">](</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s2">&quot;MyExp2SynBB&quot;</span><span class="p">,</span> <span class="n">tau1</span><span class="o">=</span><span class="mf">0.07</span><span class="p">,</span> <span class="n">tau2</span><span class="o">=</span><span class="mf">9.1</span><span class="p">,</span> <span class="n">e</span><span class="o">=-</span><span class="mf">80.0</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">bas_local</span> <span class="ow">in</span> <span class="n">conn_rng</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">BAS_COUNT</span><span class="p">),</span> <span class="mi">50</span><span class="p">):</span>
-        <span class="n">micro</span><span class="o">.</span><span class="n">network</span><span class="p">()</span><span class="o">.</span><span class="n">sid_connect</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">bas_population</span><span class="o">.</span><span class="n">gid_begin</span><span class="p">)</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">bas_local</span><span class="p">),</span> <span class="n">target</span><span class="p">,</span> <span class="mf">4.0</span> <span class="o">*</span> <span class="mf">0.18e-3</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">bas_local</span> <span class="ow">in</span> <span class="n">conn_rng</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">bas_indices</span><span class="p">,</span> <span class="mi">50</span><span class="p">):</span>
+        <span class="n">network</span><span class="o">.</span><span class="n">sid_connect</span><span class="p">(</span><span class="n">bas_gid_begin</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">bas_local</span><span class="p">),</span> <span class="n">target</span><span class="p">,</span> <span class="mf">4.0</span> <span class="o">*</span> <span class="mf">0.18e-3</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">olm_population</span><span class="p">:</span>
     <span class="n">target</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;soma&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">](</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s2">&quot;MyExp2SynBB&quot;</span><span class="p">,</span> <span class="n">tau1</span><span class="o">=</span><span class="mf">0.07</span><span class="p">,</span> <span class="n">tau2</span><span class="o">=</span><span class="mf">9.1</span><span class="p">,</span> <span class="n">e</span><span class="o">=-</span><span class="mf">80.0</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">bas_local</span> <span class="ow">in</span> <span class="n">conn_rng</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">BAS_COUNT</span><span class="p">),</span> <span class="mi">17</span><span class="p">):</span>
-        <span class="n">micro</span><span class="o">.</span><span class="n">network</span><span class="p">()</span><span class="o">.</span><span class="n">sid_connect</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">bas_population</span><span class="o">.</span><span class="n">gid_begin</span><span class="p">)</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">bas_local</span><span class="p">),</span> <span class="n">target</span><span class="p">,</span> <span class="mf">0.05</span> <span class="o">*</span> <span class="mf">4.0</span> <span class="o">*</span> <span class="mf">0.18e-3</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">bas_local</span> <span class="ow">in</span> <span class="n">conn_rng</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">bas_indices</span><span class="p">,</span> <span class="mi">17</span><span class="p">):</span>
+        <span class="n">network</span><span class="o">.</span><span class="n">sid_connect</span><span class="p">(</span><span class="n">bas_gid_begin</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">bas_local</span><span class="p">),</span> <span class="n">target</span><span class="p">,</span> <span class="mf">0.05</span> <span class="o">*</span> <span class="mf">4.0</span> <span class="o">*</span> <span class="mf">0.18e-3</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">pyr_population</span><span class="p">:</span>
     <span class="n">target</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;Adend2&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">](</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s2">&quot;MyExp2SynBB&quot;</span><span class="p">,</span> <span class="n">tau1</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">tau2</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span> <span class="n">e</span><span class="o">=-</span><span class="mf">80.0</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">olm_local</span> <span class="ow">in</span> <span class="n">conn_rng</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">OLM_COUNT</span><span class="p">),</span> <span class="mi">10</span><span class="p">):</span>
-        <span class="n">micro</span><span class="o">.</span><span class="n">network</span><span class="p">()</span><span class="o">.</span><span class="n">sid_connect</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">olm_population</span><span class="o">.</span><span class="n">gid_begin</span><span class="p">)</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">olm_local</span><span class="p">),</span> <span class="n">target</span><span class="p">,</span> <span class="mf">0.08</span> <span class="o">*</span> <span class="mf">4.0</span> <span class="o">*</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="mf">6.0e-3</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">olm_local</span> <span class="ow">in</span> <span class="n">conn_rng</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">olm_indices</span><span class="p">,</span> <span class="mi">10</span><span class="p">):</span>
+        <span class="n">network</span><span class="o">.</span><span class="n">sid_connect</span><span class="p">(</span><span class="n">olm_gid_begin</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">olm_local</span><span class="p">),</span> <span class="n">target</span><span class="p">,</span> <span class="mf">0.08</span> <span class="o">*</span> <span class="mf">4.0</span> <span class="o">*</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="mf">6.0e-3</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
 </code></pre></div>
 
 <h2>Macro Modeling</h2>
 <p>MIND_Sim is designed as an extension of the <a href="https://neuron.yale.edu/neuron/">NEURON Simulator</a>. Therefore, the <a href="https://nrn.readthedocs.io/en/latest/nmodl/language/nmodl.html">MOD/NMODL</a> language is used not only for ion channels and synapses, but also for macro-scale neural population dynamics, <code>macro2macro coupling</code>, <code>macro2micro transforms</code>, and <code>micro2macro transforms</code>.</p>
-<p>The cross-scale transform design follows the event-based view used in recent multiscale co-simulation studies, including <a href="https://doi.org/10.3389/fncom.2025.1731161">Hater, Courson, Lu, Diaz-Pier, and Manos (2026), Arbor-TVB: a novel multi-scale co-simulation framework with a case study on neural-level seizure generation and whole-brain propagation</a>, and <a href="https://doi.org/10.3389/fninf.2024.1156683">Kusch, Diaz-Pier, Klijn, Sontheimer, Bernard, Morrison, and Jirsa (2024), Multiscale co-simulation design pattern for neuroscience applications</a>. From a NEURON perspective, <code>micro2macro transforms</code> are analogous to handling spike events emitted by individual cells, while <code>macro2micro transforms</code> are analogous to external NetStim-like event injection into selected micro-scale synapses. <code>macro2macro coupling</code> is also expressed as a connection rule: a source ROI exposes a variable, an edge-level rule transforms it through weight and delay, and the result contributes to a named input of the target ROI. Unlike synaptic events, this macro2macro path is continuous rather than spike-discrete.</p>
-<p>At the macro level, the model remains connectome-based. ROI-to-ROI coupling does not need to know whether an ROI is implemented by a macro equation or by a microcircuit. The coupling interface is determined by the source ROI's <code>SOURCE_EXPOSURE</code> and the target ROI's <code>TARGET_INPUT</code>. This means that one microcircuit can cover multiple ROIs, and different ROIs can still use different neural mass or neural field models.</p>
-<p>This role split also determines where coupling nonlinearities should be written. If a model first sums incoming edge contributions and then applies a nonlinear operation, that nonlinear operation belongs in the <code>ROLE REGION</code> mechanism, because the region mechanism receives the accumulated <code>TARGET_INPUT</code>. If a model applies a nonlinear operation to each edge before summation, that operation belongs in the <code>ROLE MACRO2MACRO</code> mechanism, because <code>MACRO2MACRO</code> is evaluated at the edge level before contributing to the target input.</p>
+<p>The cross-scale transform design follows the event-based view used in recent multiscale co-simulation studies, including <a href="https://doi.org/10.3389/fncom.2025.1731161">Hater, Courson, Lu, Diaz-Pier, and Manos (2026), Arbor-TVB: a novel multi-scale co-simulation framework with a case study on neural-level seizure generation and whole-brain propagation</a>, and <a href="https://doi.org/10.3389/fninf.2024.1156683">Kusch, Diaz-Pier, Klijn, Sontheimer, Bernard, Morrison, and Jirsa (2024), Multiscale co-simulation design pattern for neuroscience applications</a>. From a NEURON perspective, <code>micro2macro transforms</code> are analogous to handling spike events emitted by individual cells, while <code>macro2micro transforms</code> are analogous to external NetStim-like event injection into selected micro-scale synapses. <code>macro2macro coupling</code> is also expressed as a connection rule: a source ROI exposes a variable, an edge-level rule transforms it through weight and delay, and the result contributes to a named exposure of the target ROI. Unlike synaptic events, this macro2macro path is continuous rather than spike-discrete.</p>
+<p>At the macro level, the model remains connectome-based. ROI-to-ROI coupling does not need to know whether an ROI is implemented by a macro equation or by a microcircuit. The coupling interface is declared explicitly with <code>READ_SOURCE</code>, <code>READ_TARGET</code>, <code>WRITE_SOURCE</code>, and <code>WRITE_TARGET</code>. This means that one microcircuit can cover multiple ROIs, and different ROIs can still expose different variables for neural mass models, coupling rules, or cross-scale transforms.</p>
+<p>This role split also determines where coupling nonlinearities should be written. If a model first sums incoming edge contributions and then applies a nonlinear operation, that nonlinear operation belongs in the <code>ROLE REGION</code> mechanism, because the region mechanism receives the accumulated exposure. If a model applies a nonlinear operation to each edge before summation, that operation belongs in the <code>ROLE MACRO2MACRO</code> mechanism, because <code>MACRO2MACRO</code> is evaluated at the edge level before contributing to the target exposure.</p>
 <p>The benefit of this design is that every ROI and every micro-scale neuron remains explicitly addressable. Different ROIs can use different macro equations and coupling rules, while individual neurons can still receive heterogeneous macro2micro inputs or contribute to different micro2macro outputs. Runtime efficiency is preserved by grouping mechanisms and variables by name in structure-of-arrays layouts, so heterogeneous model components can still be executed in batched form.</p>
 <p>The transform mechanisms used in this demo are listed below. The ordinary <code>NEURON</code> blocks still describe MOD mechanisms, while the additional <code>MIND</code> blocks declare how each mechanism participates in the macro and cross-scale graph.</p>
 <p><code>tvb_epileptor2d.mod</code> defines the ROI-level Epileptor2D macro model.</p>
@@ -346,8 +355,7 @@ mind_nrnivmodl<span class="w"> </span>mod
 
 MIND {
     ROLE REGION
-    TARGET_INPUT coupled_x
-    SOURCE_EXPOSURE x, z
+    EXPOSURE x, z, coupled_x
 }
 
 PARAMETER {
@@ -407,16 +415,16 @@ DERIVATIVE states {
 }
 </code></pre></div>
 
-<p><code>vep_x_macro2macro.mod</code> maps a source ROI's <code>x</code> exposure into the <code>coupled_x</code> input of another macro ROI.</p>
+<p><code>vep_x_macro2macro.mod</code> maps a source ROI's <code>x</code> exposure into the <code>coupled_x</code> exposure of another macro ROI.</p>
 <div class="highlight"><pre><span></span><code>NEURON {
     POINT_PROCESS vep_x_macro2macro
-    RANGE x, coupled_x, weight, delay, a
+    RANGE x_source, coupled_x, weight, delay, a
 }
 
 MIND {
     ROLE MACRO2MACRO
-    SOURCE_EXPOSURE x
-    TARGET_INPUT coupled_x
+    READ_SOURCE x AS x_source
+    WRITE_TARGET coupled_x
 }
 
 PARAMETER {
@@ -424,27 +432,27 @@ PARAMETER {
 }
 
 ASSIGNED {
-    x
+    x_source
     coupled_x
     weight
     delay
 }
 
 BREAKPOINT {
-    coupled_x = coupled_x + a * weight * x
+    coupled_x = a * weight * x_source
 }
 </code></pre></div>
 
-<p><code>ca3_input_macro2macro.mod</code> maps macro inputs into the <code>ca3_input</code> variable used by the CA3 macro2micro transform.</p>
+<p><code>ca3_input_macro2macro.mod</code> maps macro exposures into the <code>ca3_input</code> variable used by the CA3 macro2micro transform.</p>
 <div class="highlight"><pre><span></span><code>NEURON {
     POINT_PROCESS ca3_input_macro2macro
-    RANGE x, ca3_input, weight, delay, a
+    RANGE x_source, ca3_input, weight, delay, a
 }
 
 MIND {
     ROLE MACRO2MACRO
-    SOURCE_EXPOSURE x
-    TARGET_INPUT ca3_input
+    READ_SOURCE x AS x_source
+    WRITE_TARGET ca3_input
 }
 
 PARAMETER {
@@ -452,14 +460,14 @@ PARAMETER {
 }
 
 ASSIGNED {
-    x
+    x_source
     ca3_input
     weight
     delay
 }
 
 BREAKPOINT {
-    ca3_input = ca3_input + a * weight * x
+    ca3_input = a * weight * x_source
 }
 </code></pre></div>
 
@@ -474,7 +482,7 @@ BREAKPOINT {
 
 MIND {
     ROLE MACRO2MICRO
-    TARGET_INPUT ca3_input
+    READ_SOURCE ca3_input
 }
 
 PARAMETER {
@@ -552,7 +560,7 @@ NET_RECEIVE(weight) {
 
 MIND {
     ROLE MICRO2MACRO
-    SOURCE_EXPOSURE x
+    EXPOSURE x
 }
 
 PARAMETER {
@@ -598,7 +606,7 @@ NET_RECEIVE(weight) {
 
 MIND {
     ROLE MICRO2MACRO
-    SOURCE_EXPOSURE x
+    EXPOSURE x
 }
 
 PARAMETER {
@@ -643,7 +651,7 @@ NET_RECEIVE(weight) {
 
 MIND {
     ROLE MICRO2MACRO
-    SOURCE_EXPOSURE x
+    EXPOSURE x
 }
 
 PARAMETER {
@@ -678,7 +686,7 @@ NET_RECEIVE(weight) {
 }
 </code></pre></div>
 
-<p>At the macro scale, ROIs other than <code>Left-CA3</code> use the <code>tvb_epileptor2d</code> mechanism. <code>Left-CA3</code> is marked as a micro ROI, so its regional behavior is supplied through the CA3 microcircuit and the transform modules.</p>
+<p>At the macro scale, macro ROIs use the <code>tvb_epileptor2d</code> mechanism to declare and initialize ROI exposures. <code>Left-CA3</code> is a micro ROI, so it declares its ROI exposure interface with <code>use_micro(exposures=[...])</code>; its <code>x</code> exposure is supplied by the CA3 microcircuit through micro2macro transform modules, and its <code>ca3_input</code> exposure receives incoming macro coupling for the macro2micro transform.</p>
 <div class="highlight"><pre><span></span><code><span class="n">macro_rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">1234</span><span class="p">)</span>
 <span class="n">propagation_labels</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;Left-CA1&quot;</span><span class="p">,</span>
@@ -697,28 +705,28 @@ NET_RECEIVE(weight) {
         <span class="n">x0</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.9</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">x0</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.4</span>
-    <span class="n">initial_state</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x0</span> <span class="o">+</span> <span class="mf">0.02</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">macro_rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">()),</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">}</span>
-    <span class="k">if</span> <span class="n">roi</span><span class="o">.</span><span class="n">label</span> <span class="o">!=</span> <span class="n">left_ca3_roi</span><span class="o">.</span><span class="n">label</span><span class="p">:</span>
-        <span class="n">roi</span><span class="o">.</span><span class="n">use_macro</span><span class="p">(</span>
-            <span class="s2">&quot;tvb_epileptor2d&quot;</span><span class="p">,</span>
-            <span class="n">initial_state</span><span class="o">=</span><span class="n">initial_state</span><span class="p">,</span>
-            <span class="n">params</span><span class="o">=</span><span class="p">{</span>
-                <span class="s2">&quot;x0&quot;</span><span class="p">:</span> <span class="n">x0</span><span class="p">,</span>
-                <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
-                <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">,</span>
-                <span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
-                <span class="s2">&quot;d&quot;</span><span class="p">:</span> <span class="mf">5.0</span><span class="p">,</span>
-                <span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="mf">0.00035</span><span class="p">,</span>
-                <span class="s2">&quot;slope&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-                <span class="s2">&quot;kvf&quot;</span><span class="p">:</span> <span class="mf">0.35</span><span class="p">,</span>
-                <span class="s2">&quot;ks&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-                <span class="s2">&quot;tt&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
-                <span class="s2">&quot;i_ext&quot;</span><span class="p">:</span> <span class="mf">3.1</span><span class="p">,</span>
-                <span class="s2">&quot;modification&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-            <span class="p">},</span>
-        <span class="p">)</span>
-
-<span class="n">left_ca3_roi</span><span class="o">.</span><span class="n">use_micro</span><span class="p">()</span>
+    <span class="n">x_initial</span> <span class="o">=</span> <span class="n">x0</span> <span class="o">+</span> <span class="mf">0.02</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">macro_rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">roi</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="n">left_ca3_roi</span><span class="o">.</span><span class="n">label</span><span class="p">:</span>
+        <span class="k">continue</span>
+    <span class="n">roi</span><span class="o">.</span><span class="n">use_macro</span><span class="p">(</span>
+        <span class="s2">&quot;tvb_epileptor2d&quot;</span><span class="p">,</span>
+        <span class="n">initial_state</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x_initial</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>
+        <span class="n">params</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;x0&quot;</span><span class="p">:</span> <span class="n">x0</span><span class="p">,</span>
+            <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">,</span>
+            <span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="s2">&quot;d&quot;</span><span class="p">:</span> <span class="mf">5.0</span><span class="p">,</span>
+            <span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="mf">0.00035</span><span class="p">,</span>
+            <span class="s2">&quot;slope&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;kvf&quot;</span><span class="p">:</span> <span class="mf">0.35</span><span class="p">,</span>
+            <span class="s2">&quot;ks&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;tt&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="s2">&quot;i_ext&quot;</span><span class="p">:</span> <span class="mf">3.1</span><span class="p">,</span>
+            <span class="s2">&quot;modification&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+<span class="n">left_ca3_roi</span><span class="o">.</span><span class="n">use_micro</span><span class="p">(</span><span class="n">exposures</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;ca3_input&quot;</span><span class="p">])</span>
 </code></pre></div>
 
 <p>The <code>macro2micro transform</code> converts the <code>ca3_input</code> signal into spike events delivered to synapses on CA3 pyramidal cells.</p>
@@ -843,34 +851,34 @@ NET_RECEIVE(weight) {
 <tr>
 <td>MIND_Sim async</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.215s</td>
-<td style="text-align: right;">16.401s</td>
-<td style="text-align: right;">3.57x</td>
-</tr>
-<tr>
-<td>MIND_Sim async</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">0.198s</td>
-<td style="text-align: right;">6.556s</td>
-<td style="text-align: right;">4.89x</td>
+<td style="text-align: right;">0.187s</td>
+<td style="text-align: right;">16.702s</td>
+<td style="text-align: right;">3.97x</td>
 </tr>
 <tr>
 <td>TVB+NEURON</td>
 <td style="text-align: right;">1</td>
-<td style="text-align: right;">0.495s</td>
-<td style="text-align: right;">58.501s</td>
+<td style="text-align: right;">0.591s</td>
+<td style="text-align: right;">66.327s</td>
 <td style="text-align: right;">1.00x</td>
+</tr>
+<tr>
+<td>MIND_Sim async</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.169s</td>
+<td style="text-align: right;">6.672s</td>
+<td style="text-align: right;">4.88x</td>
 </tr>
 <tr>
 <td>TVB+NEURON</td>
 <td style="text-align: right;">4</td>
-<td style="text-align: right;">0.513s</td>
-<td style="text-align: right;">32.040s</td>
+<td style="text-align: right;">0.558s</td>
+<td style="text-align: right;">32.531s</td>
 <td style="text-align: right;">1.00x</td>
 </tr>
 </tbody>
 </table>
-<p>For the same 1 s runs, using the TVB+NEURON reference with TVB's official macro APIs, the maximum absolute differences between MIND_Sim and the reference are <code>1.28464e-06</code> for macro <code>x</code>, <code>1.4922e-09</code> for macro <code>z</code>, and <code>2.17177e-10 mV</code> for representative PYR, BAS, OLM, and PYR Adend3 voltage traces. The macro comparison includes the precision boundary between TVB's single-precision (<code>float32</code>) state/history storage and MIND_Sim's double-precision macro state. Spike sample indices are exactly equal for the representative PYR, BAS, and OLM cells. This result should be read as an example-level performance comparison, not as a standardized benchmark. The reference TVB+NEURON implementation is available <a href="https://github.com/HengyeZhu/MIND_Sim/blob/main/examples/ca3_epilepsy_cosim/neuron_tvb/run_tvb_neuron_ca3_cosim.py">here</a>.</p>
+<p>For the same 1 s runs, using the TVB+NEURON reference with TVB's official macro APIs, the maximum absolute differences between MIND_Sim and the reference are <code>1.28464e-06</code> for macro <code>x</code>, <code>1.4922e-09</code> for macro <code>z</code>, and <code>8.98019e-11 mV</code> for representative PYR, BAS, OLM, and PYR Adend3 voltage traces. The macro comparison includes the precision boundary between TVB's single-precision (<code>float32</code>) state/history storage and MIND_Sim's double-precision macro state. Spike sample indices are exactly equal for the representative PYR, BAS, and OLM cells. This result should be read as an example-level performance comparison, not as a standardized benchmark. The reference TVB+NEURON implementation is available <a href="https://github.com/HengyeZhu/MIND_Sim/blob/main/examples/ca3_epilepsy_cosim/neuron_tvb/run_tvb_neuron_ca3_cosim.py">here</a>.</p>
         </section>
 
         <br><br><br>
