@@ -30,6 +30,8 @@ Since the main goal of this demo is to demonstrate the MIND_Sim workflow, the mo
 Before running the script, compile the MOD mechanisms from the example directory:
 
 ```bash
+conda activate mind_sim
+pip install .
 cd ca3_epilepsy_cosim/mind_sim
 mind_nrnivmodl mod
 ```
@@ -126,6 +128,13 @@ micro.build_morphology(
 pyr_population = micro.population("PYR")
 bas_population = micro.population("BAS")
 olm_population = micro.population("OLM")
+network = micro.network()
+pyr_gid_begin = int(pyr_population.gid_begin)
+bas_gid_begin = int(bas_population.gid_begin)
+olm_gid_begin = int(olm_population.gid_begin)
+pyr_indices = range(PYR_COUNT)
+bas_indices = range(BAS_COUNT)
+olm_indices = range(OLM_COUNT)
 
 for cell in pyr_population:
     cell.v_init = -65.0
@@ -163,7 +172,7 @@ for cell in pyr_population:
     cell.group("soma")[0](0.5).insert("IClamp", **{"del": 0.2, "dur": 1.0e9, "amp": 0.1})
     soma = cell.group("soma")[0](0.5)
     sid = int(cell.gid)
-    micro.network().register_spike_source(sid, soma._ref_v, SPIKE_THRESHOLD_MV)
+    network.register_spike_source(sid, soma._ref_v, SPIKE_THRESHOLD_MV)
 for cell in bas_population:
     cell.v_init = -65.0
     soma = cell.group("soma")
@@ -173,7 +182,7 @@ for cell in bas_population:
     soma.insert("Nafbwb")
     soma.insert("Kdrbwb")
     sid = int(cell.gid)
-    micro.network().register_spike_source(sid, soma[0](0.5)._ref_v, SPIKE_THRESHOLD_MV)
+    network.register_spike_source(sid, soma[0](0.5)._ref_v, SPIKE_THRESHOLD_MV)
 for cell in olm_population:
     cell.v_init = -65.0
     soma = cell.group("soma")
@@ -188,7 +197,7 @@ for cell in olm_population:
     soma.insert("KCaolmw")
     soma[0](0.5).insert("IClamp", **{"del": 0.2, "dur": 1.0e9, "amp": -25e-3})
     sid = int(cell.gid)
-    micro.network().register_spike_source(sid, soma[0](0.5)._ref_v, SPIKE_THRESHOLD_MV)
+    network.register_spike_source(sid, soma[0](0.5)._ref_v, SPIKE_THRESHOLD_MV)
 ```
 
 Voltage locations that can emit spikes are registered as spike sources while each population is configured. Although this example uses `sid = int(cell.gid)` in `register_spike_source(sid, ref, threshold)`, the two are different concepts: `cell.gid` identifies a cell, while `sid` identifies a registered spike source. This example uses the same value only because each cell contributes one spike source.
@@ -207,8 +216,8 @@ for cell in bas_population:
         r=1.0,
         e=0.0,
     )
-    for pyr_local in conn_rng.sample(range(PYR_COUNT), 100):
-        micro.network().sid_connect(int(pyr_population.gid_begin) + int(pyr_local), target, 1.15 * 1.2e-3, 2.0)
+    for pyr_local in conn_rng.sample(pyr_indices, 100):
+        network.sid_connect(pyr_gid_begin + int(pyr_local), target, 1.15 * 1.2e-3, 2.0)
 
 for cell in olm_population:
     target = cell.group("soma")[0](0.5).insert(
@@ -220,11 +229,11 @@ for cell in olm_population:
         r=1.0,
         e=0.0,
     )
-    for pyr_local in conn_rng.sample(range(PYR_COUNT), 10):
-        micro.network().sid_connect(int(pyr_population.gid_begin) + int(pyr_local), target, 0.7e-3, 2.0)
+    for pyr_local in conn_rng.sample(pyr_indices, 10):
+        network.sid_connect(pyr_gid_begin + int(pyr_local), target, 0.7e-3, 2.0)
 
 for cell in pyr_population:
-    pyr_local_post = int(cell.gid) - int(pyr_population.gid_begin)
+    pyr_local_post = int(cell.gid) - pyr_gid_begin
     target = cell.group("Bdend")[0](1.0).insert(
         "MyExp2SynNMDABB",
         tau1=0.05,
@@ -234,62 +243,62 @@ for cell in pyr_population:
         r=1.0,
         e=0.0,
     )
-    for pyr_local_pre in conn_rng.sample(range(PYR_COUNT), 25):
+    for pyr_local_pre in conn_rng.sample(pyr_indices, 25):
         if pyr_local_pre == pyr_local_post:
             continue
-        micro.network().sid_connect(int(pyr_population.gid_begin) + int(pyr_local_pre), target, 0.004e-3, 2.0)
+        network.sid_connect(pyr_gid_begin + int(pyr_local_pre), target, 0.004e-3, 2.0)
 
 for cell in bas_population:
     target = cell.group("soma")[0](0.5).insert("MyExp2SynBB", tau1=0.05, tau2=5.3, e=0.0)
-    for pyr_local in conn_rng.sample(range(PYR_COUNT), 100):
-        micro.network().sid_connect(int(pyr_population.gid_begin) + int(pyr_local), target, 0.3 * 1.2e-3, 2.0)
+    for pyr_local in conn_rng.sample(pyr_indices, 100):
+        network.sid_connect(pyr_gid_begin + int(pyr_local), target, 0.3 * 1.2e-3, 2.0)
 
 for cell in olm_population:
     target = cell.group("soma")[0](0.5).insert("MyExp2SynBB", tau1=0.05, tau2=5.3, e=0.0)
-    for pyr_local in conn_rng.sample(range(PYR_COUNT), 10):
-        micro.network().sid_connect(int(pyr_population.gid_begin) + int(pyr_local), target, 0.3 * 1.2e-3, 2.0)
+    for pyr_local in conn_rng.sample(pyr_indices, 10):
+        network.sid_connect(pyr_gid_begin + int(pyr_local), target, 0.3 * 1.2e-3, 2.0)
 
 for cell in pyr_population:
-    pyr_local_post = int(cell.gid) - int(pyr_population.gid_begin)
+    pyr_local_post = int(cell.gid) - pyr_gid_begin
     target = cell.group("Bdend")[0](1.0).insert("MyExp2SynBB", tau1=0.05, tau2=5.3, e=0.0)
-    for pyr_local_pre in conn_rng.sample(range(PYR_COUNT), 25):
+    for pyr_local_pre in conn_rng.sample(pyr_indices, 25):
         if pyr_local_pre == pyr_local_post:
             continue
-        micro.network().sid_connect(int(pyr_population.gid_begin) + int(pyr_local_pre), target, 0.5 * 0.04e-3, 2.0)
+        network.sid_connect(pyr_gid_begin + int(pyr_local_pre), target, 0.5 * 0.04e-3, 2.0)
 
 for cell in bas_population:
-    bas_local_post = int(cell.gid) - int(bas_population.gid_begin)
+    bas_local_post = int(cell.gid) - bas_gid_begin
     target = cell.group("soma")[0](0.5).insert("MyExp2SynBB", tau1=0.07, tau2=9.1, e=-80.0)
-    for bas_local_pre in conn_rng.sample(range(BAS_COUNT), 60):
+    for bas_local_pre in conn_rng.sample(bas_indices, 60):
         if bas_local_pre == bas_local_post:
             continue
-        micro.network().sid_connect(int(bas_population.gid_begin) + int(bas_local_pre), target, 3.0 * 1.5e-3, 2.0)
+        network.sid_connect(bas_gid_begin + int(bas_local_pre), target, 3.0 * 1.5e-3, 2.0)
 
 for cell in pyr_population:
     target = cell.group("soma")[0](0.5).insert("MyExp2SynBB", tau1=0.07, tau2=9.1, e=-80.0)
-    for bas_local in conn_rng.sample(range(BAS_COUNT), 50):
-        micro.network().sid_connect(int(bas_population.gid_begin) + int(bas_local), target, 4.0 * 0.18e-3, 2.0)
+    for bas_local in conn_rng.sample(bas_indices, 50):
+        network.sid_connect(bas_gid_begin + int(bas_local), target, 4.0 * 0.18e-3, 2.0)
 
 for cell in olm_population:
     target = cell.group("soma")[0](0.5).insert("MyExp2SynBB", tau1=0.07, tau2=9.1, e=-80.0)
-    for bas_local in conn_rng.sample(range(BAS_COUNT), 17):
-        micro.network().sid_connect(int(bas_population.gid_begin) + int(bas_local), target, 0.05 * 4.0 * 0.18e-3, 2.0)
+    for bas_local in conn_rng.sample(bas_indices, 17):
+        network.sid_connect(bas_gid_begin + int(bas_local), target, 0.05 * 4.0 * 0.18e-3, 2.0)
 
 for cell in pyr_population:
     target = cell.group("Adend2")[0](0.5).insert("MyExp2SynBB", tau1=0.2, tau2=20.0, e=-80.0)
-    for olm_local in conn_rng.sample(range(OLM_COUNT), 10):
-        micro.network().sid_connect(int(olm_population.gid_begin) + int(olm_local), target, 0.08 * 4.0 * 3.0 * 6.0e-3, 2.0)
+    for olm_local in conn_rng.sample(olm_indices, 10):
+        network.sid_connect(olm_gid_begin + int(olm_local), target, 0.08 * 4.0 * 3.0 * 6.0e-3, 2.0)
 ```
 
 ## Macro Modeling
 
 MIND_Sim is designed as an extension of the [NEURON Simulator](https://neuron.yale.edu/neuron/). Therefore, the [MOD/NMODL](https://nrn.readthedocs.io/en/latest/nmodl/language/nmodl.html) language is used not only for ion channels and synapses, but also for macro-scale neural population dynamics, `macro2macro coupling`, `macro2micro transforms`, and `micro2macro transforms`.
 
-The cross-scale transform design follows the event-based view used in recent multiscale co-simulation studies, including [Hater, Courson, Lu, Diaz-Pier, and Manos (2026), Arbor-TVB: a novel multi-scale co-simulation framework with a case study on neural-level seizure generation and whole-brain propagation](https://doi.org/10.3389/fncom.2025.1731161), and [Kusch, Diaz-Pier, Klijn, Sontheimer, Bernard, Morrison, and Jirsa (2024), Multiscale co-simulation design pattern for neuroscience applications](https://doi.org/10.3389/fninf.2024.1156683). From a NEURON perspective, `micro2macro transforms` are analogous to handling spike events emitted by individual cells, while `macro2micro transforms` are analogous to external NetStim-like event injection into selected micro-scale synapses. `macro2macro coupling` is also expressed as a connection rule: a source ROI exposes a variable, an edge-level rule transforms it through weight and delay, and the result contributes to a named input of the target ROI. Unlike synaptic events, this macro2macro path is continuous rather than spike-discrete.
+The cross-scale transform design follows the event-based view used in recent multiscale co-simulation studies, including [Hater, Courson, Lu, Diaz-Pier, and Manos (2026), Arbor-TVB: a novel multi-scale co-simulation framework with a case study on neural-level seizure generation and whole-brain propagation](https://doi.org/10.3389/fncom.2025.1731161), and [Kusch, Diaz-Pier, Klijn, Sontheimer, Bernard, Morrison, and Jirsa (2024), Multiscale co-simulation design pattern for neuroscience applications](https://doi.org/10.3389/fninf.2024.1156683). From a NEURON perspective, `micro2macro transforms` are analogous to handling spike events emitted by individual cells, while `macro2micro transforms` are analogous to external NetStim-like event injection into selected micro-scale synapses. `macro2macro coupling` is also expressed as a connection rule: a source ROI exposes a variable, an edge-level rule transforms it through weight and delay, and the result contributes to a named exposure of the target ROI. Unlike synaptic events, this macro2macro path is continuous rather than spike-discrete.
 
-At the macro level, the model remains connectome-based. ROI-to-ROI coupling does not need to know whether an ROI is implemented by a macro equation or by a microcircuit. The coupling interface is determined by the source ROI's `SOURCE_EXPOSURE` and the target ROI's `TARGET_INPUT`. This means that one microcircuit can cover multiple ROIs, and different ROIs can still use different neural mass or neural field models.
+At the macro level, the model remains connectome-based. ROI-to-ROI coupling does not need to know whether an ROI is implemented by a macro equation or by a microcircuit. The coupling interface is declared explicitly with `READ_SOURCE`, `READ_TARGET`, `WRITE_SOURCE`, and `WRITE_TARGET`. This means that one microcircuit can cover multiple ROIs, and different ROIs can still expose different variables for neural mass models, coupling rules, or cross-scale transforms.
 
-This role split also determines where coupling nonlinearities should be written. If a model first sums incoming edge contributions and then applies a nonlinear operation, that nonlinear operation belongs in the `ROLE REGION` mechanism, because the region mechanism receives the accumulated `TARGET_INPUT`. If a model applies a nonlinear operation to each edge before summation, that operation belongs in the `ROLE MACRO2MACRO` mechanism, because `MACRO2MACRO` is evaluated at the edge level before contributing to the target input.
+This role split also determines where coupling nonlinearities should be written. If a model first sums incoming edge contributions and then applies a nonlinear operation, that nonlinear operation belongs in the `ROLE REGION` mechanism, because the region mechanism receives the accumulated exposure. If a model applies a nonlinear operation to each edge before summation, that operation belongs in the `ROLE MACRO2MACRO` mechanism, because `MACRO2MACRO` is evaluated at the edge level before contributing to the target exposure.
 
 The benefit of this design is that every ROI and every micro-scale neuron remains explicitly addressable. Different ROIs can use different macro equations and coupling rules, while individual neurons can still receive heterogeneous macro2micro inputs or contribute to different micro2macro outputs. Runtime efficiency is preserved by grouping mechanisms and variables by name in structure-of-arrays layouts, so heterogeneous model components can still be executed in batched form.
 
@@ -306,8 +315,7 @@ NEURON {
 
 MIND {
     ROLE REGION
-    TARGET_INPUT coupled_x
-    SOURCE_EXPOSURE x, z
+    EXPOSURE x, z, coupled_x
 }
 
 PARAMETER {
@@ -367,18 +375,18 @@ DERIVATIVE states {
 }
 ```
 
-`vep_x_macro2macro.mod` maps a source ROI's `x` exposure into the `coupled_x` input of another macro ROI.
+`vep_x_macro2macro.mod` maps a source ROI's `x` exposure into the `coupled_x` exposure of another macro ROI.
 
 ```text
 NEURON {
     POINT_PROCESS vep_x_macro2macro
-    RANGE x, coupled_x, weight, delay, a
+    RANGE x_source, coupled_x, weight, delay, a
 }
 
 MIND {
     ROLE MACRO2MACRO
-    SOURCE_EXPOSURE x
-    TARGET_INPUT coupled_x
+    READ_SOURCE x AS x_source
+    WRITE_TARGET coupled_x
 }
 
 PARAMETER {
@@ -386,29 +394,29 @@ PARAMETER {
 }
 
 ASSIGNED {
-    x
+    x_source
     coupled_x
     weight
     delay
 }
 
 BREAKPOINT {
-    coupled_x = coupled_x + a * weight * x
+    coupled_x = a * weight * x_source
 }
 ```
 
-`ca3_input_macro2macro.mod` maps macro inputs into the `ca3_input` variable used by the CA3 macro2micro transform.
+`ca3_input_macro2macro.mod` maps macro exposures into the `ca3_input` variable used by the CA3 macro2micro transform.
 
 ```text
 NEURON {
     POINT_PROCESS ca3_input_macro2macro
-    RANGE x, ca3_input, weight, delay, a
+    RANGE x_source, ca3_input, weight, delay, a
 }
 
 MIND {
     ROLE MACRO2MACRO
-    SOURCE_EXPOSURE x
-    TARGET_INPUT ca3_input
+    READ_SOURCE x AS x_source
+    WRITE_TARGET ca3_input
 }
 
 PARAMETER {
@@ -416,14 +424,14 @@ PARAMETER {
 }
 
 ASSIGNED {
-    x
+    x_source
     ca3_input
     weight
     delay
 }
 
 BREAKPOINT {
-    ca3_input = ca3_input + a * weight * x
+    ca3_input = a * weight * x_source
 }
 ```
 
@@ -440,7 +448,7 @@ NEURON {
 
 MIND {
     ROLE MACRO2MICRO
-    TARGET_INPUT ca3_input
+    READ_SOURCE ca3_input
 }
 
 PARAMETER {
@@ -520,7 +528,7 @@ NEURON {
 
 MIND {
     ROLE MICRO2MACRO
-    SOURCE_EXPOSURE x
+    EXPOSURE x
 }
 
 PARAMETER {
@@ -568,7 +576,7 @@ NEURON {
 
 MIND {
     ROLE MICRO2MACRO
-    SOURCE_EXPOSURE x
+    EXPOSURE x
 }
 
 PARAMETER {
@@ -615,7 +623,7 @@ NEURON {
 
 MIND {
     ROLE MICRO2MACRO
-    SOURCE_EXPOSURE x
+    EXPOSURE x
 }
 
 PARAMETER {
@@ -650,7 +658,7 @@ NET_RECEIVE(weight) {
 }
 ```
 
-At the macro scale, ROIs other than `Left-CA3` use the `tvb_epileptor2d` mechanism. `Left-CA3` is marked as a micro ROI, so its regional behavior is supplied through the CA3 microcircuit and the transform modules.
+At the macro scale, macro ROIs use the `tvb_epileptor2d` mechanism to declare and initialize ROI exposures. `Left-CA3` is a micro ROI, so it declares its ROI exposure interface with `use_micro(exposures=[...])`; its `x` exposure is supplied by the CA3 microcircuit through micro2macro transform modules, and its `ca3_input` exposure receives incoming macro coupling for the macro2micro transform.
 
 ```py
 macro_rng = np.random.default_rng(1234)
@@ -671,28 +679,28 @@ for roi in rois.rois():
         x0 = -1.9
     else:
         x0 = -2.4
-    initial_state = {"x": x0 + 0.02 * float(macro_rng.standard_normal()), "z": 0.0}
-    if roi.label != left_ca3_roi.label:
-        roi.use_macro(
-            "tvb_epileptor2d",
-            initial_state=initial_state,
-            params={
-                "x0": x0,
-                "a": 1.0,
-                "b": 3.0,
-                "c": 1.0,
-                "d": 5.0,
-                "r": 0.00035,
-                "slope": 0.0,
-                "kvf": 0.35,
-                "ks": 0.0,
-                "tt": 1.0,
-                "i_ext": 3.1,
-                "modification": 0.0,
-            },
-        )
-
-left_ca3_roi.use_micro()
+    x_initial = x0 + 0.02 * float(macro_rng.standard_normal())
+    if roi.label == left_ca3_roi.label:
+        continue
+    roi.use_macro(
+        "tvb_epileptor2d",
+        initial_state={"x": x_initial, "z": 0.0},
+        params={
+            "x0": x0,
+            "a": 1.0,
+            "b": 3.0,
+            "c": 1.0,
+            "d": 5.0,
+            "r": 0.00035,
+            "slope": 0.0,
+            "kvf": 0.35,
+            "ks": 0.0,
+            "tt": 1.0,
+            "i_ext": 3.1,
+            "modification": 0.0,
+        },
+    )
+left_ca3_roi.use_micro(exposures=["x", "ca3_input"])
 ```
 
 The `macro2micro transform` converts the `ca3_input` signal into spike events delivered to synapses on CA3 pyramidal cells.
@@ -824,9 +832,9 @@ In this example, MIND_Sim is compared with a TVB+NEURON reference using the curr
 
 | Workflow | Threads | Pre-run | Run | Speedup |
 | --- | ---: | ---: | ---: | ---: |
-| MIND_Sim async | 1 | 0.215s | 16.401s | 3.57x |
-| MIND_Sim async | 4 | 0.198s | 6.556s | 4.89x |
-| TVB+NEURON | 1 | 0.495s | 58.501s | 1.00x |
-| TVB+NEURON | 4 | 0.513s | 32.040s | 1.00x |
+| MIND_Sim async | 1 | 0.187s | 16.702s | 3.97x |
+| TVB+NEURON | 1 | 0.591s | 66.327s | 1.00x |
+| MIND_Sim async | 4 | 0.169s | 6.672s | 4.88x |
+| TVB+NEURON | 4 | 0.558s | 32.531s | 1.00x |
 
-For the same 1 s runs, using the TVB+NEURON reference with TVB's official macro APIs, the maximum absolute differences between MIND_Sim and the reference are `1.28464e-06` for macro `x`, `1.4922e-09` for macro `z`, and `2.17177e-10 mV` for representative PYR, BAS, OLM, and PYR Adend3 voltage traces. The macro comparison includes the precision boundary between TVB's single-precision (`float32`) state/history storage and MIND_Sim's double-precision macro state. Spike sample indices are exactly equal for the representative PYR, BAS, and OLM cells. This result should be read as an example-level performance comparison, not as a standardized benchmark. The reference TVB+NEURON implementation is available [here](https://github.com/HengyeZhu/MIND_Sim/blob/main/examples/ca3_epilepsy_cosim/neuron_tvb/run_tvb_neuron_ca3_cosim.py).
+For the same 1 s runs, using the TVB+NEURON reference with TVB's official macro APIs, the maximum absolute differences between MIND_Sim and the reference are `1.28464e-06` for macro `x`, `1.4922e-09` for macro `z`, and `8.98019e-11 mV` for representative PYR, BAS, OLM, and PYR Adend3 voltage traces. The macro comparison includes the precision boundary between TVB's single-precision (`float32`) state/history storage and MIND_Sim's double-precision macro state. Spike sample indices are exactly equal for the representative PYR, BAS, and OLM cells. This result should be read as an example-level performance comparison, not as a standardized benchmark. The reference TVB+NEURON implementation is available [here](https://github.com/HengyeZhu/MIND_Sim/blob/main/examples/ca3_epilepsy_cosim/neuron_tvb/run_tvb_neuron_ca3_cosim.py).
