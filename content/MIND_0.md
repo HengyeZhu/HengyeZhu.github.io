@@ -27,13 +27,13 @@ Since the main goal of this demo is to demonstrate the MIND_Sim workflow, the mo
 
 ## Simulation Setup
 
-Before running the script, compile the MOD mechanisms from the example directory:
+Before running the script, install MIND_Sim and compile the MOD mechanisms from the repository root:
 
 ```bash
 conda activate mind_sim
-pip install .
-cd ca3_epilepsy_cosim/mind_sim
-mind_nrnivmodl mod
+pip install mind-simulator
+cd MIND_Sim
+mind-nrnivmodl examples/ca3_epilepsy_cosim/mind_sim/mod
 ```
 
 After compilation, the setup step loads the compiled mechanism directory once and sets the basic simulation resolution.
