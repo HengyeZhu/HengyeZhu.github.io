@@ -92,11 +92,11 @@
 <p>The <code>mod/</code> directory contains both the standard NEURON/CoreNEURON mechanisms for the CA3 microcircuit and the MIND_Sim extended MOD modules for macro dynamics, <code>macro2macro coupling</code>, <code>micro2macro transforms</code>, and <code>macro2micro transforms</code>.</p>
 <p>Since the main goal of this demo is to demonstrate the MIND_Sim workflow, the model parameters were not specifically optimized; instead, they largely follow the original model settings.</p>
 <h2>Simulation Setup</h2>
-<p>Before running the script, compile the MOD mechanisms from the example directory:</p>
+<p>Before running the script, install MIND_Sim and compile the MOD mechanisms from the repository root:</p>
 <div class="highlight"><pre><span></span><code>conda<span class="w"> </span>activate<span class="w"> </span>mind_sim
-pip<span class="w"> </span>install<span class="w"> </span>.
-<span class="nb">cd</span><span class="w"> </span>ca3_epilepsy_cosim/mind_sim
-mind_nrnivmodl<span class="w"> </span>mod
+pip<span class="w"> </span>install<span class="w"> </span>mind-simulator
+<span class="nb">cd</span><span class="w"> </span>MIND_Sim
+mind-nrnivmodl<span class="w"> </span>examples/ca3_epilepsy_cosim/mind_sim/mod
 </code></pre></div>
 
 <p>After compilation, the setup step loads the compiled mechanism directory once and sets the basic simulation resolution.</p>
