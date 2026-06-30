@@ -99,35 +99,33 @@ pip<span class="w"> </span>install<span class="w"> </span>.
 mind_nrnivmodl<span class="w"> </span>mod
 </code></pre></div>
 
-<p>After compilation, the setup step loads the required mechanisms and sets the basic simulation resolution.</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">mind_sim</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ms</span>
+<p>After compilation, the setup step loads the compiled mechanism directory once and sets the basic simulation resolution.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">mind_sim</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ms</span>
 
-<span class="n">ms</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">load_mech</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;mod&quot;</span><span class="p">)</span>
+<span class="n">ms</span><span class="o">.</span><span class="n">load_mech</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">mod_dir</span><span class="p">)</span>
 <span class="n">ms</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">dt</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
 <span class="n">ms</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">exchange_window</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
 
-<span class="n">micro</span> <span class="o">=</span> <span class="n">ms</span><span class="o">.</span><span class="n">Sim</span><span class="p">()</span>
-<span class="n">micro</span><span class="o">.</span><span class="n">set_device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+<span class="n">micro</span> <span class="o">=</span> <span class="n">ms</span><span class="o">.</span><span class="n">micro</span><span class="o">.</span><span class="n">sim</span><span class="p">()</span>
+<span class="n">micro</span><span class="o">.</span><span class="n">set_device</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 <span class="n">micro</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">micro_threads</span><span class="p">)</span>
 <span class="n">micro</span><span class="o">.</span><span class="n">set_dt</span><span class="p">(</span><span class="mf">0.025</span><span class="p">)</span>
-<span class="n">micro</span><span class="o">.</span><span class="n">load_mech</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;mod&quot;</span><span class="p">))</span>
 </code></pre></div>
 
-<p>Here, <code>micro.set_device("cpu")</code> selects CPU execution for the micro simulator, and <code>micro.set_num_threads(...)</code> configures CPU threads. The macro part of MIND_Sim is single-threaded and forms a pipeline with the micro simulation, while the micro part is backed by CoreNEURON and supports CPU multithreading and GPU execution.</p>
+<p>Here, <code>ms.load_mech(...)</code> loads both the micro mechanisms and the MIND_Sim extended MOD mechanisms from the compiled <code>mod/</code> directory. <code>micro.set_device(...)</code> selects CPU or GPU execution for the micro simulator, and <code>micro.set_num_threads(...)</code> configures CPU threads. The macro part of MIND_Sim is single-threaded and forms a pipeline with the micro simulation, while the micro part is backed by CoreNEURON and supports CPU multithreading and GPU execution.</p>
 <h2>Load ROIs</h2>
 <p>The first step in MIND_Sim is to create ROIs from a connectivity matrix like <a href="https://github.com/HengyeZhu/MIND_Sim/blob/main/examples/ca3_epilepsy_cosim/data/synthetic_hybrid_ca3_connectivity.csv">this</a>.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">mind_sim</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ms</span>
 
 <span class="n">rois</span> <span class="o">=</span> <span class="n">ms</span><span class="o">.</span><span class="n">macro</span><span class="o">.</span><span class="n">load_rois</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">connectivity_csv</span><span class="p">)</span>
-<span class="n">roi_list</span> <span class="o">=</span> <span class="n">rois</span><span class="o">.</span><span class="n">rois</span><span class="p">()</span>
+<span class="n">roi_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">rois</span><span class="p">)</span>
 <span class="n">roi_labels</span> <span class="o">=</span> <span class="n">rois</span><span class="o">.</span><span class="n">labels</span>
 <span class="n">roi_weights</span> <span class="o">=</span> <span class="n">rois</span><span class="o">.</span><span class="n">weights</span>
 <span class="n">roi_delays</span> <span class="o">=</span> <span class="n">rois</span><span class="o">.</span><span class="n">delays</span>
 <span class="n">left_ca3_roi</span> <span class="o">=</span> <span class="n">rois</span><span class="o">.</span><span class="n">roi</span><span class="p">(</span><span class="s2">&quot;Left-CA3&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-<p>Here, <code>load_rois</code> reads the connectivity matrix and creates one ROI object for each region label. The returned ROI collection stores the region labels, connection weights, and delays, and individual ROIs can be accessed by name.</p>
+<p>Here, <code>load_rois</code> reads the connectivity matrix and creates one ROI object for each region label. The returned ROI collection is iterable, stores the region labels, connection weights, and delays, and individual ROIs can be accessed by name.</p>
 <h2>Micro Modeling</h2>
 <p>MIND_Sim is inspired by <a href="https://neuroml.org/">NeuroML</a>: neurons with the same morphology are treated as instances of one template. This is one source of frontend construction speedup, and it is also a modeling semantic that users should follow when defining populations.</p>
 <p>To use a morphology template, users can load an SWC file and modify the generated sections, or build sections from scratch as shown below. The API is <code>ms.section(name, label)</code>, where <code>label</code> is the section group name. Users then call <code>micro.build_morphology(...)</code> explicitly and pass the sections used by each population. This differs from standard NEURON scripting: MIND_Sim does not instantiate every cell immediately when Python statements are executed. Instead, the Python frontend records model-building operations, and the corresponding C++ structures are constructed in batch. Later, <code>micro.build_microcircuit()</code> builds the biophysical properties and network connectivity after mechanisms, synapses, and connections have been specified.</p>
@@ -253,7 +251,7 @@ mind_nrnivmodl<span class="w"> </span>mod
 
 <p>Voltage locations that can emit spikes are registered as spike sources while each population is configured. Although this example uses <code>sid = int(cell.gid)</code> in <code>register_spike_source(sid, ref, threshold)</code>, the two are different concepts: <code>cell.gid</code> identifies a cell, while <code>sid</code> identifies a registered spike source. This example uses the same value only because each cell contributes one spike source.</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Micro recurrent connections</span>
-<span class="n">conn_rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">(</span><span class="mi">4321</span><span class="p">)</span>
+<span class="n">conn_rng</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">ca3_connectivity_seed</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">bas_population</span><span class="p">:</span>
     <span class="n">target</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;soma&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">](</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span>
@@ -342,7 +340,7 @@ mind_nrnivmodl<span class="w"> </span>mod
 <h2>Macro Modeling</h2>
 <p>MIND_Sim is designed as an extension of the <a href="https://neuron.yale.edu/neuron/">NEURON Simulator</a>. Therefore, the <a href="https://nrn.readthedocs.io/en/latest/nmodl/language/nmodl.html">MOD/NMODL</a> language is used not only for ion channels and synapses, but also for macro-scale neural population dynamics, <code>macro2macro coupling</code>, <code>macro2micro transforms</code>, and <code>micro2macro transforms</code>.</p>
 <p>The cross-scale transform design follows the event-based view used in recent multiscale co-simulation studies, including <a href="https://doi.org/10.3389/fncom.2025.1731161">Hater, Courson, Lu, Diaz-Pier, and Manos (2026), Arbor-TVB: a novel multi-scale co-simulation framework with a case study on neural-level seizure generation and whole-brain propagation</a>, and <a href="https://doi.org/10.3389/fninf.2024.1156683">Kusch, Diaz-Pier, Klijn, Sontheimer, Bernard, Morrison, and Jirsa (2024), Multiscale co-simulation design pattern for neuroscience applications</a>. From a NEURON perspective, <code>micro2macro transforms</code> are analogous to handling spike events emitted by individual cells, while <code>macro2micro transforms</code> are analogous to external NetStim-like event injection into selected micro-scale synapses. <code>macro2macro coupling</code> is also expressed as a connection rule: a source ROI exposes a variable, an edge-level rule transforms it through weight and delay, and the result contributes to a named exposure of the target ROI. Unlike synaptic events, this macro2macro path is continuous rather than spike-discrete.</p>
-<p>At the macro level, the model remains connectome-based. ROI-to-ROI coupling does not need to know whether an ROI is implemented by a macro equation or by a microcircuit. The coupling interface is declared explicitly with <code>READ_SOURCE</code>, <code>READ_TARGET</code>, <code>WRITE_SOURCE</code>, and <code>WRITE_TARGET</code>. This means that one microcircuit can cover multiple ROIs, and different ROIs can still expose different variables for neural mass models, coupling rules, or cross-scale transforms.</p>
+<p>At the macro level, the model remains connectome-based. ROI-to-ROI coupling does not need to know whether an ROI is implemented by a macro equation or by a microcircuit. In this demo, macro mechanisms declare ROI variables with <code>EXPOSURE</code>, while edge-level transforms use <code>READ_SOURCE</code> and <code>WRITE_TARGET</code> to move values between ROIs. This means that one microcircuit can cover multiple ROIs, and different ROIs can still expose different variables for neural mass models, coupling rules, or cross-scale transforms.</p>
 <p>This role split also determines where coupling nonlinearities should be written. If a model first sums incoming edge contributions and then applies a nonlinear operation, that nonlinear operation belongs in the <code>ROLE REGION</code> mechanism, because the region mechanism receives the accumulated exposure. If a model applies a nonlinear operation to each edge before summation, that operation belongs in the <code>ROLE MACRO2MACRO</code> mechanism, because <code>MACRO2MACRO</code> is evaluated at the edge level before contributing to the target exposure.</p>
 <p>The benefit of this design is that every ROI and every micro-scale neuron remains explicitly addressable. Different ROIs can use different macro equations and coupling rules, while individual neurons can still receive heterogeneous macro2micro inputs or contribute to different micro2macro outputs. Runtime efficiency is preserved by grouping mechanisms and variables by name in structure-of-arrays layouts, so heterogeneous model components can still be executed in batched form.</p>
 <p>The transform mechanisms used in this demo are listed below. The ordinary <code>NEURON</code> blocks still describe MOD mechanisms, while the additional <code>MIND</code> blocks declare how each mechanism participates in the macro and cross-scale graph.</p>
@@ -560,7 +558,7 @@ NET_RECEIVE(weight) {
 
 MIND {
     ROLE MICRO2MACRO
-    EXPOSURE x
+    WRITE_TARGET x
 }
 
 PARAMETER {
@@ -606,7 +604,7 @@ NET_RECEIVE(weight) {
 
 MIND {
     ROLE MICRO2MACRO
-    EXPOSURE x
+    WRITE_TARGET x
 }
 
 PARAMETER {
@@ -651,7 +649,7 @@ NET_RECEIVE(weight) {
 
 MIND {
     ROLE MICRO2MACRO
-    EXPOSURE x
+    WRITE_TARGET x
 }
 
 PARAMETER {
@@ -687,7 +685,7 @@ NET_RECEIVE(weight) {
 </code></pre></div>
 
 <p>At the macro scale, macro ROIs use the <code>tvb_epileptor2d</code> mechanism to declare and initialize ROI exposures. <code>Left-CA3</code> is a micro ROI, so it declares its ROI exposure interface with <code>use_micro(exposures=[...])</code>; its <code>x</code> exposure is supplied by the CA3 microcircuit through micro2macro transform modules, and its <code>ca3_input</code> exposure receives incoming macro coupling for the macro2micro transform.</p>
-<div class="highlight"><pre><span></span><code><span class="n">macro_rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">1234</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">macro_rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">macro_init_seed</span><span class="p">)</span>
 <span class="n">propagation_labels</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;Left-CA1&quot;</span><span class="p">,</span>
     <span class="s2">&quot;Right-CA1&quot;</span><span class="p">,</span>
@@ -698,19 +696,22 @@ NET_RECEIVE(weight) {
     <span class="s2">&quot;Left-entorhinal&quot;</span><span class="p">,</span>
     <span class="s2">&quot;Right-entorhinal&quot;</span><span class="p">,</span>
 <span class="p">}</span>
-<span class="k">for</span> <span class="n">roi</span> <span class="ow">in</span> <span class="n">rois</span><span class="o">.</span><span class="n">rois</span><span class="p">():</span>
+<span class="n">initial_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rois</span><span class="o">.</span><span class="n">labels</span><span class="p">))</span>
+<span class="n">initial_z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rois</span><span class="o">.</span><span class="n">labels</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">roi_index</span><span class="p">,</span> <span class="n">roi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">rois</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">roi</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="n">left_ca3_roi</span><span class="o">.</span><span class="n">label</span><span class="p">:</span>
         <span class="n">x0</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.6</span>
     <span class="k">elif</span> <span class="n">roi</span><span class="o">.</span><span class="n">label</span> <span class="ow">in</span> <span class="n">propagation_labels</span><span class="p">:</span>
         <span class="n">x0</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.9</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">x0</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.4</span>
-    <span class="n">x_initial</span> <span class="o">=</span> <span class="n">x0</span> <span class="o">+</span> <span class="mf">0.02</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">macro_rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">())</span>
+    <span class="n">x_initial</span> <span class="o">=</span> <span class="n">x0</span> <span class="o">+</span> <span class="mf">0.02</span> <span class="o">*</span> <span class="n">macro_rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">()</span>
+    <span class="n">initial_x</span><span class="p">[</span><span class="n">roi_index</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="k">if</span> <span class="n">roi</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="n">left_ca3_roi</span><span class="o">.</span><span class="n">label</span> <span class="k">else</span> <span class="n">x_initial</span>
     <span class="k">if</span> <span class="n">roi</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="n">left_ca3_roi</span><span class="o">.</span><span class="n">label</span><span class="p">:</span>
         <span class="k">continue</span>
     <span class="n">roi</span><span class="o">.</span><span class="n">use_macro</span><span class="p">(</span>
         <span class="s2">&quot;tvb_epileptor2d&quot;</span><span class="p">,</span>
-        <span class="n">initial_state</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">x_initial</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>
+        <span class="n">initial_state</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">initial_x</span><span class="p">[</span><span class="n">roi_index</span><span class="p">],</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">initial_z</span><span class="p">[</span><span class="n">roi_index</span><span class="p">]},</span>
         <span class="n">params</span><span class="o">=</span><span class="p">{</span>
             <span class="s2">&quot;x0&quot;</span><span class="p">:</span> <span class="n">x0</span><span class="p">,</span>
             <span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
@@ -798,16 +799,19 @@ NET_RECEIVE(weight) {
 
 <p>The macro initial history can be provided explicitly with TVB-style chronological ordering. The first axis is time, and <code>history[-1]</code> is the current <code>t = 0</code> state.</p>
 <div class="highlight"><pre><span></span><code><span class="n">history_steps</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">roi_delays</span><span class="p">)</span> <span class="o">/</span> <span class="mf">0.1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
-<span class="n">history_alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">history_steps</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
-<span class="n">roi_phase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">roi_labels</span><span class="p">),</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
-
-<span class="n">macro_initial_history</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">history_steps</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">roi_labels</span><span class="p">)))</span>
-<span class="n">macro_initial_history</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_x</span> <span class="o">+</span> <span class="mf">0.01</span> <span class="o">*</span> <span class="n">history_alpha</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">roi_phase</span><span class="p">)</span>
-<span class="n">macro_initial_history</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_z</span> <span class="o">+</span> <span class="mf">0.002</span> <span class="o">*</span> <span class="n">history_alpha</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">roi_phase</span><span class="p">)</span>
-<span class="n">macro_initial_history</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_x</span>
-<span class="n">macro_initial_history</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_z</span>
-
-<span class="n">rois</span><span class="o">.</span><span class="n">initial_history</span><span class="p">(</span><span class="n">macro_initial_history</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">])</span>
+<span class="n">history_alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">history_steps</span><span class="p">)</span>
+<span class="n">roi_phase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">roi_labels</span><span class="p">),</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">roi_index</span><span class="p">,</span> <span class="n">roi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">roi_list</span><span class="p">):</span>
+    <span class="n">roi_initial_history</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">history_steps</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">roi_initial_history</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">initial_x</span><span class="p">[</span><span class="n">roi_index</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.01</span> <span class="o">*</span> <span class="n">history_alpha</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">roi_phase</span><span class="p">[</span><span class="n">roi_index</span><span class="p">])</span>
+    <span class="p">)</span>
+    <span class="n">roi_initial_history</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">initial_z</span><span class="p">[</span><span class="n">roi_index</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.002</span> <span class="o">*</span> <span class="n">history_alpha</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">roi_phase</span><span class="p">[</span><span class="n">roi_index</span><span class="p">])</span>
+    <span class="p">)</span>
+    <span class="n">roi_initial_history</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_x</span><span class="p">[</span><span class="n">roi_index</span><span class="p">]</span>
+    <span class="n">roi_initial_history</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_z</span><span class="p">[</span><span class="n">roi_index</span><span class="p">]</span>
+    <span class="n">roi</span><span class="o">.</span><span class="n">initial_history</span><span class="p">(</span><span class="n">roi_initial_history</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">])</span>
 </code></pre></div>
 
 <p>After the cross-scale transforms and macro history are configured, the microcircuit can be built.</p>
@@ -816,7 +820,7 @@ NET_RECEIVE(weight) {
 
 <h2>Recording</h2>
 <p>At the macro level, recording is matched exactly by exposure name.</p>
-<div class="highlight"><pre><span></span><code><span class="k">for</span> <span class="n">roi</span> <span class="ow">in</span> <span class="n">rois</span><span class="o">.</span><span class="n">rois</span><span class="p">():</span>
+<div class="highlight"><pre><span></span><code><span class="k">for</span> <span class="n">roi</span> <span class="ow">in</span> <span class="n">rois</span><span class="p">:</span>
     <span class="n">roi</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
     <span class="n">roi</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">)</span>
 </code></pre></div>
@@ -831,10 +835,11 @@ NET_RECEIVE(weight) {
 
 <p>After recording is configured, the model can be executed.</p>
 <div class="highlight"><pre><span></span><code><span class="n">micro</span><span class="o">.</span><span class="n">finitialize</span><span class="p">(</span><span class="o">-</span><span class="mf">65.0</span><span class="p">)</span>
-<span class="n">simulator</span> <span class="o">=</span> <span class="n">ms</span><span class="o">.</span><span class="n">Simulator</span><span class="p">(</span><span class="n">rois</span><span class="p">)</span>
+<span class="n">simulator</span> <span class="o">=</span> <span class="n">ms</span><span class="o">.</span><span class="n">Simulator</span><span class="p">(</span><span class="n">rois</span><span class="p">,</span> <span class="n">macro2micro_seed</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">macro2micro_seed</span><span class="p">)</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">simulator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">duration_ms</span><span class="p">)</span>
 </code></pre></div>
 
+<p>The <code>macro2micro_seed</code> argument makes the stochastic macro2micro event generation reproducible.</p>
 <h2>Performance</h2>
 <p>In this example, MIND_Sim is compared with a TVB+NEURON reference using the current 1 s CA3 epilepsy co-simulation runs.</p>
 <table>
