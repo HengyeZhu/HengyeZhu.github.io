@@ -36,24 +36,22 @@ cd ca3_epilepsy_cosim/mind_sim
 mind_nrnivmodl mod
 ```
 
-After compilation, the setup step loads the required mechanisms and sets the basic simulation resolution.
+After compilation, the setup step loads the compiled mechanism directory once and sets the basic simulation resolution.
 
 ```py
-from pathlib import Path
 import mind_sim as ms
 
-ms.macro.load_mech(Path(__file__).resolve().parent / "mod")
+ms.load_mech(args.mod_dir)
 ms.macro.dt(0.1)
 ms.macro.exchange_window(0.5)
 
-micro = ms.Sim()
-micro.set_device("cpu")
+micro = ms.micro.sim()
+micro.set_device(args.device)
 micro.set_num_threads(args.micro_threads)
 micro.set_dt(0.025)
-micro.load_mech(str(Path(__file__).resolve().parent / "mod"))
 ```
 
-Here, `micro.set_device("cpu")` selects CPU execution for the micro simulator, and `micro.set_num_threads(...)` configures CPU threads. The macro part of MIND_Sim is single-threaded and forms a pipeline with the micro simulation, while the micro part is backed by CoreNEURON and supports CPU multithreading and GPU execution.
+Here, `ms.load_mech(...)` loads both the micro mechanisms and the MIND_Sim extended MOD mechanisms from the compiled `mod/` directory. `micro.set_device(...)` selects CPU or GPU execution for the micro simulator, and `micro.set_num_threads(...)` configures CPU threads. The macro part of MIND_Sim is single-threaded and forms a pipeline with the micro simulation, while the micro part is backed by CoreNEURON and supports CPU multithreading and GPU execution.
 
 ## Load ROIs
 
@@ -63,14 +61,14 @@ The first step in MIND_Sim is to create ROIs from a connectivity matrix like [th
 import mind_sim as ms
 
 rois = ms.macro.load_rois(args.connectivity_csv)
-roi_list = rois.rois()
+roi_list = list(rois)
 roi_labels = rois.labels
 roi_weights = rois.weights
 roi_delays = rois.delays
 left_ca3_roi = rois.roi("Left-CA3")
 ```
 
-Here, `load_rois` reads the connectivity matrix and creates one ROI object for each region label. The returned ROI collection stores the region labels, connection weights, and delays, and individual ROIs can be accessed by name.
+Here, `load_rois` reads the connectivity matrix and creates one ROI object for each region label. The returned ROI collection is iterable, stores the region labels, connection weights, and delays, and individual ROIs can be accessed by name.
 
 ## Micro Modeling
 
@@ -204,7 +202,7 @@ Voltage locations that can emit spikes are registered as spike sources while eac
 
 ```py
 # Micro recurrent connections
-conn_rng = random.Random(4321)
+conn_rng = random.Random(args.ca3_connectivity_seed)
 
 for cell in bas_population:
     target = cell.group("soma")[0](0.5).insert(
@@ -296,7 +294,7 @@ MIND_Sim is designed as an extension of the [NEURON Simulator](https://neuron.ya
 
 The cross-scale transform design follows the event-based view used in recent multiscale co-simulation studies, including [Hater, Courson, Lu, Diaz-Pier, and Manos (2026), Arbor-TVB: a novel multi-scale co-simulation framework with a case study on neural-level seizure generation and whole-brain propagation](https://doi.org/10.3389/fncom.2025.1731161), and [Kusch, Diaz-Pier, Klijn, Sontheimer, Bernard, Morrison, and Jirsa (2024), Multiscale co-simulation design pattern for neuroscience applications](https://doi.org/10.3389/fninf.2024.1156683). From a NEURON perspective, `micro2macro transforms` are analogous to handling spike events emitted by individual cells, while `macro2micro transforms` are analogous to external NetStim-like event injection into selected micro-scale synapses. `macro2macro coupling` is also expressed as a connection rule: a source ROI exposes a variable, an edge-level rule transforms it through weight and delay, and the result contributes to a named exposure of the target ROI. Unlike synaptic events, this macro2macro path is continuous rather than spike-discrete.
 
-At the macro level, the model remains connectome-based. ROI-to-ROI coupling does not need to know whether an ROI is implemented by a macro equation or by a microcircuit. The coupling interface is declared explicitly with `READ_SOURCE`, `READ_TARGET`, `WRITE_SOURCE`, and `WRITE_TARGET`. This means that one microcircuit can cover multiple ROIs, and different ROIs can still expose different variables for neural mass models, coupling rules, or cross-scale transforms.
+At the macro level, the model remains connectome-based. ROI-to-ROI coupling does not need to know whether an ROI is implemented by a macro equation or by a microcircuit. In this demo, macro mechanisms declare ROI variables with `EXPOSURE`, while edge-level transforms use `READ_SOURCE` and `WRITE_TARGET` to move values between ROIs. This means that one microcircuit can cover multiple ROIs, and different ROIs can still expose different variables for neural mass models, coupling rules, or cross-scale transforms.
 
 This role split also determines where coupling nonlinearities should be written. If a model first sums incoming edge contributions and then applies a nonlinear operation, that nonlinear operation belongs in the `ROLE REGION` mechanism, because the region mechanism receives the accumulated exposure. If a model applies a nonlinear operation to each edge before summation, that operation belongs in the `ROLE MACRO2MACRO` mechanism, because `MACRO2MACRO` is evaluated at the edge level before contributing to the target exposure.
 
@@ -528,7 +526,7 @@ NEURON {
 
 MIND {
     ROLE MICRO2MACRO
-    EXPOSURE x
+    WRITE_TARGET x
 }
 
 PARAMETER {
@@ -576,7 +574,7 @@ NEURON {
 
 MIND {
     ROLE MICRO2MACRO
-    EXPOSURE x
+    WRITE_TARGET x
 }
 
 PARAMETER {
@@ -623,7 +621,7 @@ NEURON {
 
 MIND {
     ROLE MICRO2MACRO
-    EXPOSURE x
+    WRITE_TARGET x
 }
 
 PARAMETER {
@@ -661,7 +659,7 @@ NET_RECEIVE(weight) {
 At the macro scale, macro ROIs use the `tvb_epileptor2d` mechanism to declare and initialize ROI exposures. `Left-CA3` is a micro ROI, so it declares its ROI exposure interface with `use_micro(exposures=[...])`; its `x` exposure is supplied by the CA3 microcircuit through micro2macro transform modules, and its `ca3_input` exposure receives incoming macro coupling for the macro2micro transform.
 
 ```py
-macro_rng = np.random.default_rng(1234)
+macro_rng = np.random.default_rng(args.macro_init_seed)
 propagation_labels = {
     "Left-CA1",
     "Right-CA1",
@@ -672,19 +670,22 @@ propagation_labels = {
     "Left-entorhinal",
     "Right-entorhinal",
 }
-for roi in rois.rois():
+initial_x = np.zeros(len(rois.labels))
+initial_z = np.zeros(len(rois.labels))
+for roi_index, roi in enumerate(rois):
     if roi.label == left_ca3_roi.label:
         x0 = -1.6
     elif roi.label in propagation_labels:
         x0 = -1.9
     else:
         x0 = -2.4
-    x_initial = x0 + 0.02 * float(macro_rng.standard_normal())
+    x_initial = x0 + 0.02 * macro_rng.standard_normal()
+    initial_x[roi_index] = 0.0 if roi.label == left_ca3_roi.label else x_initial
     if roi.label == left_ca3_roi.label:
         continue
     roi.use_macro(
         "tvb_epileptor2d",
-        initial_state={"x": x_initial, "z": 0.0},
+        initial_state={"x": initial_x[roi_index], "z": initial_z[roi_index]},
         params={
             "x0": x0,
             "a": 1.0,
@@ -780,16 +781,19 @@ The macro initial history can be provided explicitly with TVB-style chronologica
 
 ```py
 history_steps = round(np.max(roi_delays) / 0.1) + 1
-history_alpha = np.linspace(-1.0, 0.0, history_steps)[:, np.newaxis]
-roi_phase = np.linspace(0.0, 2.0 * np.pi, len(roi_labels), endpoint=False)[np.newaxis, :]
-
-macro_initial_history = np.empty((history_steps, 2, len(roi_labels)))
-macro_initial_history[:, 0] = initial_x + 0.01 * history_alpha * np.sin(roi_phase)
-macro_initial_history[:, 1] = initial_z + 0.002 * history_alpha * np.cos(roi_phase)
-macro_initial_history[-1, 0] = initial_x
-macro_initial_history[-1, 1] = initial_z
-
-rois.initial_history(macro_initial_history, outputs=["x", "z"])
+history_alpha = np.linspace(-1.0, 0.0, history_steps)
+roi_phase = np.linspace(0.0, 2.0 * np.pi, len(roi_labels), endpoint=False)
+for roi_index, roi in enumerate(roi_list):
+    roi_initial_history = np.empty((history_steps, 2))
+    roi_initial_history[:, 0] = (
+        initial_x[roi_index] + 0.01 * history_alpha * math.sin(roi_phase[roi_index])
+    )
+    roi_initial_history[:, 1] = (
+        initial_z[roi_index] + 0.002 * history_alpha * math.cos(roi_phase[roi_index])
+    )
+    roi_initial_history[-1, 0] = initial_x[roi_index]
+    roi_initial_history[-1, 1] = initial_z[roi_index]
+    roi.initial_history(roi_initial_history, outputs=["x", "z"])
 ```
 
 After the cross-scale transforms and macro history are configured, the microcircuit can be built.
@@ -803,7 +807,7 @@ micro.build_microcircuit()
 At the macro level, recording is matched exactly by exposure name.
 
 ```py
-for roi in rois.rois():
+for roi in rois:
     roi.record("x")
     roi.record("z")
 ```
@@ -822,9 +826,11 @@ After recording is configured, the model can be executed.
 
 ```py
 micro.finitialize(-65.0)
-simulator = ms.Simulator(rois)
+simulator = ms.Simulator(rois, macro2micro_seed=args.macro2micro_seed)
 result = simulator.run(args.duration_ms)
 ```
+
+The `macro2micro_seed` argument makes the stochastic macro2micro event generation reproducible.
 
 ## Performance
 
